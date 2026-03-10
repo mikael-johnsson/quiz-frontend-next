@@ -1,0 +1,117 @@
+"use client";
+import styles from "./quizForm.module.css";
+import { getThemeOptions } from "./utils/getThemeOptions";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+const BASE_URL = "http://quiz-backend-one-alpha.vercel.app/api/questions?";
+// const DEV_URL = "http://localhost:3000/api/questions?";
+
+const QuizForm = () => {
+  const [themes, setThemes] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const loadThemes = async () => {
+      try {
+        const themes = await getThemeOptions(BASE_URL);
+        setThemes(themes);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadThemes();
+  }, []);
+
+  const handleSubmit = (e: React.SubmitEvent) => {
+    e.preventDefault();
+
+    const form = e.currentTarget as HTMLFormElement;
+    const formData = new FormData(form);
+
+    const params = new URLSearchParams();
+
+    formData.forEach((value, key) => {
+      params.append(key, value.toString());
+    });
+
+    params.append("generate", "true");
+    router.push(`/?${params.toString()}`);
+  };
+
+  if (isLoading) return <div>Loading form...</div>;
+
+  return (
+    <form id="search-form" className={styles.form} onSubmit={handleSubmit}>
+      <div className={styles.col}>
+        <h3 className={styles.heading}>Teman</h3>
+        <select
+          className={styles.select}
+          name="themes"
+          id="themes-dropdown"
+          multiple
+        >
+          {themes?.map((theme) => {
+            return (
+              <option key={theme} value={theme}>
+                {theme.toUpperCase()}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+
+      <div className={styles.col}>
+        <h3 className={styles.heading}>Svårighetsgrad</h3>
+
+        <div className={styles.checks}>
+          <label className={styles.check}>
+            <input
+              id="easy"
+              className={styles.checkInput}
+              type="checkbox"
+              value="easy"
+              name="difficulties"
+            />
+            <span className={styles.checkBox} aria-hidden="true"></span>
+            <span className="check__text">Enkelt</span>
+          </label>
+
+          <label className={styles.check}>
+            <input
+              id="medium"
+              className={styles.checkInput}
+              type="checkbox"
+              value="medium"
+              name="difficulties"
+            />
+            <span className={styles.checkBox} aria-hidden="true"></span>
+            <span className="check__text">Medium</span>
+          </label>
+
+          <label className={styles.check}>
+            <input
+              id="hard"
+              className={styles.checkInput}
+              type="checkbox"
+              value="hard"
+              name="difficulties"
+            />
+            <span className={styles.checkBox} aria-hidden="true"></span>
+            <span className="check__text">Svårt</span>
+          </label>
+        </div>
+      </div>
+
+      <button id="fetch-button" className={styles.submitButton} type="submit">
+        Generera quiz
+      </button>
+    </form>
+  );
+};
+
+export default QuizForm;

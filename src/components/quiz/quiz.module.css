@@ -1,0 +1,98 @@
+/* Clear button sits above the quiz result, styled to look like a button
+   but implemented as a Link so clicking it navigates to /?generate=false */
+.clearButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: 32rem;
+  margin: 0 auto 0.85rem;
+  padding: 0.55rem 1.25rem;
+  border-radius: 8px;
+  background-color: var(--prim-text-color);
+  color: var(--prim-bg-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.clearButton:hover {
+  background-color: color-mix(in srgb, var(--prim-text-color) 85%, transparent);
+}
+
+.clearButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.messageContainer {
+  width: 100%;
+  max-width: 32rem;
+  margin: 0 auto 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  background-color: var(--prim-text-color);
+  color: var(--prim-bg-color);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.heading {
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+
+/* Paper look — soft pink background with green text to mimic a printable document */
+.quizContainer {
+  width: 100%;
+  max-width: 32rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  background-color: var(--prim-text-color);
+  color: var(--prim-bg-color);
+  border-radius: 8px;
+  padding: 0.5rem 0;
+}
+
+.questionsContainer {
+  width: 100%;
+  max-width: 32rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 0.6rem;
+  align-items: start;
+  padding: 0.65rem 0.85rem;
+  /* Subtle divider between rows instead of separate card borders */
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--prim-bg-color) 15%, transparent);
+}
+
+.question,
+.answer {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.answer {
+  font-weight: 600;
+}
+
+@media screen and (max-width: 600px) {
+  .row {
+    display: flex;
+    flex-direction: column;
+  }
+}

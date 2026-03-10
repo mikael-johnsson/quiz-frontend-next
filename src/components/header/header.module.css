@@ -1,0 +1,96 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--accent);
+  position: relative;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 1rem;
+  z-index: 20;
+  width: min(90vw, 20rem);
+  min-width: 14rem;
+  padding: 1rem;
+  background-color: var(--prim-bg-color);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  opacity: 0.98;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+.menuOpen {
+  display: block;
+}
+
+.menuList {
+  list-style: none;
+  text-align: left;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.menuList li a {
+  display: flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.4rem 0.65rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--prim-text-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+}
+
+.menuList li a:hover {
+  background-color: color-mix(in srgb, var(--accent) 26%, transparent);
+}
+
+.menuList li a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.hidden {
+  display: none;
+}
+
+@media screen and (min-width: 992px) {
+  .menu {
+    position: static;
+    z-index: auto;
+    width: auto;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+    opacity: 1;
+  }
+
+  .menuOpen,
+  .hidden {
+    display: block;
+  }
+
+  .menuList {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .menuList li a {
+    min-height: auto;
+    padding: 0.35rem 0.55rem;
+    white-space: nowrap;
+  }
+}

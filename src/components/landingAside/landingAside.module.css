@@ -1,0 +1,34 @@
+.aside {
+  background-color: var(--prim-text-color);
+  color: var(--prim-bg-color);
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  padding: 1.25rem 1.35rem;
+  width: 100%;
+  max-width: 32rem;
+  margin: 0 auto 1.5rem;
+}
+
+.heading {
+  margin: 0 0 0.9rem;
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.text {
+  margin: 0;
+  line-height: 1.62;
+  font-size: 1rem;
+  max-width: 34ch;
+}
+
+@media screen and (min-width: 992px) {
+  .aside {
+    width: 18.5rem;
+    max-width: 18.5rem;
+    margin: 0;
+    padding: 1.35rem 1.15rem;
+    flex-shrink: 0;
+  }
+}

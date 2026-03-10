@@ -1,0 +1,12 @@
+.button {
+  border: none;
+  width: fit-content;
+  height: fit-content;
+  background-color: var(--prim-bg-color);
+}
+
+@media screen and (min-width: 992px) {
+  .button {
+    display: none;
+  }
+}

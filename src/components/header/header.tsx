@@ -43,7 +43,7 @@ const Header = () => {
             <Link href="/">OM SIDAN</Link>
           </li>
           <li>
-            <Link href="/">LOGGA IN / REGISTRERA DIG</Link>
+            <Link href="/auth">LOGGA IN / SKAPA KONTO</Link>
           </li>
         </ul>
       </nav>

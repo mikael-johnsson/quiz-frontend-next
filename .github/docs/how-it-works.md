@@ -107,6 +107,28 @@ Calls `getData`, checks the response, parses the JSON, and returns a `QuestionRe
 
 Once `getQuestions()` resolves, `Quiz` maps over the `questions` array and renders each one as a row with the question text and its answer.
 
+### 5. PDF download flow (`/api/quiz/pdf`)
+
+When the quiz is visible, `Quiz` also renders a **"Ladda ner PDF"** link.
+
+That link points to an internal Next.js route:
+
+```
+/api/quiz/pdf?themes=history&difficulties=easy
+```
+
+The route handler (`src/app/api/quiz/pdf/route.ts`) does this:
+
+1. Reads `themes` and `difficulties` from the URL query.
+2. Calls `getPdf()` in `src/services/quizService.tsx`.
+3. Forwards the backend PDF response to the browser with PDF headers.
+
+Why this pattern is used:
+
+- The backend already renders the PDF with PDFKit.
+- The frontend should treat that as an HTTP file response, not React data.
+- Keeping PDF downloading in a route handler avoids fetching binary data during server-component render.
+
 ---
 
 ## Data Types (`src/models/types.tsx`)

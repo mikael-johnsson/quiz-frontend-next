@@ -1,12 +1,23 @@
 /* Clear button sits above the quiz result, styled to look like a button
    but implemented as a Link so clicking it navigates to /?generate=false */
+.actionsContainer {
+  width: 100%;
+  max-width: 32rem;
+  margin: 0 auto 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
 .clearButton {
   display: flex;
   align-items: center;
   justify-content: center;
   width: fit-content;
   max-width: 32rem;
-  margin: 0 auto 0.85rem;
+  margin: 0;
   padding: 0.55rem 1.25rem;
   border-radius: 8px;
   background-color: var(--prim-text-color);
@@ -22,6 +33,31 @@
 }
 
 .clearButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.downloadButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 0.55rem 1.25rem;
+  border-radius: 8px;
+  border: 1px solid var(--prim-text-color);
+  background-color: transparent;
+  color: var(--prim-text-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.downloadButton:hover {
+  background-color: color-mix(in srgb, var(--prim-text-color) 12%, transparent);
+}
+
+.downloadButton:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }

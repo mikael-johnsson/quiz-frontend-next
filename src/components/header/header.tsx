@@ -22,12 +22,13 @@ const Header = () => {
 
   return (
     <header className={styles.header}>
-      <h2>Logo</h2>
+      <h2>Quiz-a-nator</h2>
       <MenuButton
         onToggle={handleMenuToggle}
         isOpen={isMenuOpen}
         controlsId={menuId}
       />
+      {/* Not showing since not used
       <nav id={menuId} className={navClassName}>
         <ul className={styles.menuList}>
           <li>
@@ -46,7 +47,7 @@ const Header = () => {
             <Link href="/auth">LOGGA IN / SKAPA KONTO</Link>
           </li>
         </ul>
-      </nav>
+      </nav> */}
     </header>
   );
 };

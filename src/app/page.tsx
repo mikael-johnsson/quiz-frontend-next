@@ -4,8 +4,7 @@ import QuizForm from "@/components/quizForm/quizForm";
 import Quiz from "@/components/quiz/quiz";
 import { normalizeArray } from "@/lib/utils";
 
-const BASE_URL = "http://quiz-backend-one-alpha.vercel.app/api/questions?";
-// const DEV_URL = "http://localhost:3000/api/questions?";
+const BASE_URL = process.env.BASE_URL || "";
 
 type PageProps = {
   searchParams: Promise<{

@@ -1,8 +1,4 @@
 import { AuthResponse, LoginRequest, SignUpRequest } from "@/models/types";
-import { postData } from "./serviceBase";
-
-// TODO: Replace with the real backend URL when it is available
-const AUTH_URL = "http://localhost:8080/api/auth";
 
 /**
  * Sends login credentials to the server and returns the auth response.

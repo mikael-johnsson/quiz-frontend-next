@@ -4,8 +4,7 @@ import { getThemeOptions } from "./utils/getThemeOptions";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const BASE_URL = "http://quiz-backend-one-alpha.vercel.app/api/questions?";
-// const DEV_URL = "http://localhost:3000/api/questions?";
+const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "";
 
 const QuizForm = () => {
   const [themes, setThemes] = useState<string[]>([]);
@@ -16,7 +15,7 @@ const QuizForm = () => {
   useEffect(() => {
     const loadThemes = async () => {
       try {
-        const themes = await getThemeOptions(BASE_URL);
+        const themes = await getThemeOptions(NEXT_PUBLIC_BASE_URL);
         setThemes(themes);
       } catch (error) {
         console.error(error);

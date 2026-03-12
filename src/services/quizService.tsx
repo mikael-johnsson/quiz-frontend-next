@@ -2,7 +2,10 @@ import { QuestionResponse } from "../models/types";
 import { getData } from "./serviceBase";
 import { buildUrl } from "./utils/buildUrl";
 
-const PDF_URL = "http://quiz-backend-one-alpha.vercel.app/api/questions/pdf";
+import { config } from "dotenv";
+
+config();
+const PDF_URL = process.env.PDF_URL || "";
 
 export const getQuestions = async (
   themes: string[],
@@ -21,10 +24,7 @@ export const getQuestions = async (
   return data;
 };
 
-export const getPdf = async (
-  themes: string[],
-  difficulties: string[],
-) => {
+export const getPdf = async (themes: string[], difficulties: string[]) => {
   const queryParams = new URLSearchParams();
 
   themes

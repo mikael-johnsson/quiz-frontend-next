@@ -2,9 +2,6 @@ import { QuestionResponse } from "../models/types";
 import { getData } from "./serviceBase";
 import { buildUrl } from "./utils/buildUrl";
 
-import { config } from "dotenv";
-
-config();
 const PDF_URL = process.env.PDF_URL || "";
 
 export const getQuestions = async (

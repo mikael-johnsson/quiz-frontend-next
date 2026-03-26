@@ -27,17 +27,13 @@ export type LoginRequest = {
 export type SignUpRequest = {
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
 };
 
 /** Shape of the response the server sends back after a successful login or sign-up */
 export type AuthResponse = {
-  token: string;
-  user: {
-    id: number;
-    email: string;
-    firstName: string;
-    lastName: string;
-  };
+  id: number;
+  email: string;
+  firstName: string;
 };

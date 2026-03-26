@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import type { SignUpRequest } from "@/models/types";
 import { signUp } from "@/services/authService";
 import styles from "./signUpForm.module.css";
 
@@ -16,6 +17,8 @@ const SignUpForm = () => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // confirmPassword is used only for client-side validation and is not sent to the API.
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   // UI feedback state
   const [isLoading, setIsLoading] = useState(false);
@@ -34,14 +37,43 @@ const SignUpForm = () => {
     // Reset any previous feedback before a new attempt
     setError(null);
     setSuccess(false);
+
+    const normalizedFirstName = firstName.trim();
+    const normalizedLastName = lastName.trim();
+    const normalizedEmail = email.trim();
+
+    // Keep explicit checks here so we can show clear messages before API calls.
+    if (
+      !normalizedFirstName ||
+      !normalizedLastName ||
+      !normalizedEmail ||
+      !password ||
+      !confirmPassword
+    ) {
+      setError("Fyll i alla fält innan du fortsätter.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Lösenorden matchar inte.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      await signUp({ firstName, lastName, email, password });
+      const payload: SignUpRequest = {
+        firstname: normalizedFirstName,
+        lastname: normalizedLastName,
+        email: normalizedEmail,
+        password,
+      };
+
+      await signUp(payload);
       setSuccess(true);
 
       // Short delay so the user can see the success message before being redirected
-      setTimeout(() => router.push("/"), 1000);
+      router.push("/login");
     } catch (err) {
       // Show the error message returned by the service (or a fallback)
       setError(
@@ -119,8 +151,23 @@ const SignUpForm = () => {
           />
         </div>
 
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="signup-confirm-password">
+            Bekräfta lösenord
+          </label>
+          <input
+            className={styles.input}
+            id="signup-confirm-password"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            autoComplete="new-password"
+          />
+        </div>
+
         <button className={styles.button} type="submit" disabled={isLoading}>
-          {isLoading ? "Signing up..." : "Sign up"}
+          {isLoading ? "Skapar konto..." : "Skapa konto"}
         </button>
 
         {/* Inline feedback — shown below the button */}

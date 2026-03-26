@@ -37,6 +37,7 @@ export const getPdf = async (themes: string[], difficulties: string[]) => {
   const res = await fetch(`${PDF_URL}?${queryParams.toString()}`, {
     method: "GET",
     cache: "no-store",
+    credentials: "include",
   });
 
   if (!res.ok) {

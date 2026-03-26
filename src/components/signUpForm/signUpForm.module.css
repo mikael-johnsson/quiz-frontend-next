@@ -99,3 +99,10 @@
   color: #1a7a4a;
   margin-top: 0.25rem;
 }
+
+/* On smaller cards, stack name fields vertically for readability. */
+@media (max-width: 480px) {
+  .row {
+    flex-direction: column;
+  }
+}

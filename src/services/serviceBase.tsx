@@ -1,9 +1,14 @@
+import { LoginRequest, SignUpRequest } from "@/models/types";
+import { log } from "console";
+
 export const getData = async (
   url: string,
   themesUrl: string,
   difficultiesUrl: string,
 ) => {
-  return fetch(`${url}${themesUrl}${difficultiesUrl}`);
+  return fetch(`${url}${themesUrl}${difficultiesUrl}`, {
+    credentials: "include",
+  });
 };
 
 /**
@@ -16,5 +21,28 @@ export const postData = async (url: string, body: unknown) => {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
+    credentials: "include",
+  });
+};
+
+const loginURI = process.env.NEXT_PUBLIC_LOGIN_URL || "default-url";
+
+export const loginUser = async (body: LoginRequest) => {
+  return await fetch(loginURI, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    credentials: "include",
+  });
+};
+
+const signUpURL = process.env.NEXT_PUBLIC_SIGNUP_URL || "default-url";
+
+export const signUpUser = async (body: SignUpRequest) => {
+  return await fetch(signUpURL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    credentials: "include",
   });
 };

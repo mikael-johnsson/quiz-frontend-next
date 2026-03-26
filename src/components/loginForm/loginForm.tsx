@@ -35,17 +35,18 @@ const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      await login({ email, password });
+      const res = await login({ email: email, password: password });
+      if (res) {
+        console.log("Login successful:", res);
+      }
+
       setSuccess(true);
 
-      // Short delay so the user can see the success message before being redirected
-      setTimeout(() => router.push("/"), 1000);
+      router.push("/");
     } catch (err) {
       // Show the error message returned by the service (or a fallback)
       setError(
-        err instanceof Error
-          ? err.message
-          : "Something went wrong. Please try again.",
+        err instanceof Error ? err.message : "Något gick fel, försök igen.",
       );
     } finally {
       setIsLoading(false);

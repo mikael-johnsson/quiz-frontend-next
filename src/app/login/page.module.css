@@ -1,0 +1,44 @@
+.main {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 7rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.heading {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Keeps the auth card narrower on dedicated login/signup pages. */
+.formWrap {
+  display: flex;
+  width: 100%;
+  max-width: 28rem;
+}
+
+.linkRow {
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+@media (min-width: 768px) {
+  .main {
+    padding: 7rem 3rem;
+  }
+}

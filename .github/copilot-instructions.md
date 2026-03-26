@@ -21,6 +21,8 @@
 - I like iterative development (get basics working first)
 - Explain trade-offs when there are multiple approaches
 - Please only speak english, even if the codebase contains comments in another language
+- If I ask you to implement something, please ask me for more details if you need them, rather than making assumptions. I prefer to give you more input than to have you implement something incorrectly and then have to redo it.
+- If I ask you to implement something, please break it down into small steps and ask me for confirmation after each step before proceeding to the next one. I prefer to have more checkpoints than to have you go too far down the wrong path.
 
 ## Styling
 

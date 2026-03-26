@@ -21,7 +21,7 @@ const Quiz = async ({
     pdfParams.append("difficulties", difficulty),
   );
 
-  const pdfDownloadHref = `/api/quiz/pdf?${pdfParams.toString()}`;
+  const pdfDownloadHref = `/quiz/pdf?${pdfParams.toString()}`;
   const questions = data.questions;
   return (
     <>

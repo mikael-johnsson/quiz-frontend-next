@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { SignUpRequest } from "@/models/types";
 import { signUp } from "@/services/authService";
+import { useAuth } from "@/contexts/AuthContext";
 import styles from "./signUpForm.module.css";
 
 /**
@@ -26,6 +28,7 @@ const SignUpForm = () => {
   const [success, setSuccess] = useState(false);
 
   const router = useRouter();
+  const { isLoading: isAuthLoading, isAuthenticated } = useAuth();
 
   /**
    * Called when the form is submitted.
@@ -83,6 +86,22 @@ const SignUpForm = () => {
       setIsLoading(false);
     }
   };
+
+  if (isAuthLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isAuthenticated) {
+    return (
+      <div className={styles.card}>
+        <h2 className={styles.heading}>Skapa konto</h2>
+        <p>Du ar redan inloggad.</p>
+        <p>
+          Gå till <Link href="/">startsidan</Link>.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.card}>

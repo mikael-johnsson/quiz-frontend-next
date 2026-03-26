@@ -3,17 +3,32 @@ import styles from "./quizForm.module.css";
 import { getThemeOptions } from "./utils/getThemeOptions";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 
 const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "";
 
 const QuizForm = () => {
   const [themes, setThemes] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { isLoading: isAuthLoading, isAuthenticated } = useAuth();
 
   const router = useRouter();
 
   useEffect(() => {
+    if (isAuthLoading) {
+      return;
+    }
+
+    if (!isAuthenticated) {
+      setIsLoading(false);
+      setThemes([]);
+      return;
+    }
+
     const loadThemes = async () => {
+      setIsLoading(true);
+
       try {
         const themes = await getThemeOptions(NEXT_PUBLIC_BASE_URL);
         setThemes(themes);
@@ -23,8 +38,9 @@ const QuizForm = () => {
         setIsLoading(false);
       }
     };
-    loadThemes();
-  }, []);
+
+    void loadThemes();
+  }, [isAuthLoading, isAuthenticated]);
 
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
@@ -42,7 +58,16 @@ const QuizForm = () => {
     router.push(`/?${params.toString()}`);
   };
 
-  if (isLoading) return <div>Loading form...</div>;
+  if (isAuthLoading || isLoading) return <div>Loading form...</div>;
+
+  if (!isAuthenticated) {
+    return (
+      <div>
+        Du behöver vara inloggad för att skapa quiz.{" "}
+        <Link href="/login">Logga in här</Link>.
+      </div>
+    );
+  }
 
   return (
     <form id="search-form" className={styles.form} onSubmit={handleSubmit}>

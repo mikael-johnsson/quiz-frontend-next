@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { login } from "@/services/authService";
+import { useAuth } from "@/contexts/AuthContext";
 import styles from "./loginForm.module.css";
 
 /**
@@ -21,6 +22,7 @@ const LoginForm = () => {
   const [success, setSuccess] = useState(false);
 
   const router = useRouter();
+  const { loginAction, isLoading: isAuthLoading, isAuthenticated } = useAuth();
 
   /**
    * Called when the form is submitted.
@@ -35,7 +37,7 @@ const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      const res = await login({ email: email, password: password });
+      const res = await loginAction({ email: email, password: password });
       if (res) {
         console.log("Login successful:", res);
       }
@@ -52,6 +54,22 @@ const LoginForm = () => {
       setIsLoading(false);
     }
   };
+
+  if (isAuthLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isAuthenticated) {
+    return (
+      <div className={styles.card}>
+        <h2 className={styles.heading}>Logga in</h2>
+        <p>Du ar redan inloggad.</p>
+        <p>
+          Gå till <Link href="/">startsidan</Link>.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.card}>

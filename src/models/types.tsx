@@ -35,5 +35,5 @@ export type SignUpRequest = {
 export type AuthResponse = {
   id: number;
   email: string;
-  firstName: string;
+  firstname: string;
 };

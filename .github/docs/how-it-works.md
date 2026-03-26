@@ -129,6 +129,42 @@ Why this pattern is used:
 - The frontend should treat that as an HTTP file response, not React data.
 - Keeping PDF downloading in a route handler avoids fetching binary data during server-component render.
 
+### 6. Auth state flow (`AuthProvider` + `/me` + logout)
+
+Auth is cookie-based (backend sets `quiz_login`) and frontend requests include credentials.
+
+The app now has a shared auth state provider:
+
+```
+Root layout
+  → AuthProvider (src/contexts/AuthContext.tsx)
+    → Header + pages + components can read auth state with useAuth()
+```
+
+`AuthProvider` does this:
+
+1. Keeps one shared state: `user`, `isLoading`, `isAuthenticated`.
+2. Calls `getMe()` on mount to hydrate auth from backend cookie.
+3. Exposes `loginAction`, `logoutAction`, and `refreshMe`.
+
+How login updates state:
+
+- `LoginForm` calls `loginAction(...)` from context.
+- On success, context stores the authenticated user.
+- Header updates automatically because it reads the same context.
+
+How logout works:
+
+- Header shows a `Logga ut` button when authenticated.
+- Clicking it calls `logoutAction()`.
+- `logoutAction()` calls backend `POST /logout` and clears local auth state.
+
+How quiz form uses auth now:
+
+- `QuizForm` checks auth state from context.
+- If user is not authenticated, it shows a login prompt instead of loading quiz themes.
+- This is UI-level auth gating only (no middleware redirects yet).
+
 ---
 
 ## Data Types (`src/models/types.tsx`)

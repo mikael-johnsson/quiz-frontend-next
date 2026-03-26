@@ -137,3 +137,135 @@ Goal: Replace mocked auth service responses with real backend endpoint calls whi
 - Token persistence strategy changes
 - Route protection/middleware
 - Converting endpoint constants to environment variables (can be done in a later step)
+
+---
+
+## Auth Evolution (Context + /me + Header Logout)
+
+Goal: Evolve auth into a shared, app-wide state model so most components can check login status without duplicating logic, and add a reliable logout action in the header.
+
+### Decisions
+
+- Use React Context now for global auth state (`user`, `isLoading`, `isAuthenticated`)
+- Use backend `POST /logout` for sign-out
+- Use backend `/me` to hydrate auth state from cookie
+- Keep this iteration as UI-state only (no route redirect guards yet)
+
+### Scope
+
+- Introduce a centralized auth provider + hook
+- Make header auth-aware with a logout button
+- Wire login/signup flows into shared auth state
+- Keep cookie-based auth (`quiz_login`) and `credentials: "include"`
+
+### Implementation Plan
+
+#### Phase 1: Stabilize auth configuration
+
+1. Remove manual dotenv usage from runtime app code and rely on Next env loading.
+2. Ensure auth-related client env vars use `NEXT_PUBLIC_` prefix.
+3. Verify all auth requests use HTTPS and `credentials: "include"`.
+
+#### Phase 2: Define auth service surface
+
+1. Centralize auth-specific functions in `src/services/authService.tsx`:
+   - `login`
+   - `signUp`
+   - `getMe`
+   - `logout`
+2. Keep `src/services/serviceBase.tsx` focused on generic transport helpers.
+3. Standardize error handling for `401` and network failures.
+
+#### Phase 3: Add global auth context
+
+1. Create `src/contexts/AuthContext.tsx` with:
+   - `user`
+   - `isLoading`
+   - `isAuthenticated`
+   - `refreshMe`
+   - `setUser` or equivalent login update action
+   - `logoutAction`
+2. On provider mount, call `/me` once to hydrate user state from cookie.
+3. Keep `/me` checking centralized in context instead of calling it in each component.
+
+#### Phase 4: Integrate provider at app root
+
+1. Wrap app shell in provider via `src/app/layout.tsx`.
+2. Ensure pages that do not need auth logic remain simple.
+
+#### Phase 5: Wire login/signup to shared state
+
+1. After successful login, update context immediately (or call `refreshMe`).
+2. Keep signup redirect flow unchanged unless backend later supports auto-login.
+3. Improve loading/error UX where needed.
+
+#### Phase 6: Add logout button in header
+
+1. Update `src/components/header/header.tsx` to consume auth context.
+2. Logged-out UI: show login/signup actions.
+3. Logged-in UI: show user indicator + `Logout` button.
+4. Logout button calls `POST /logout`, clears context state, and updates header immediately.
+
+#### Phase 7: Cross-component auth usage
+
+1. Components needing only auth status use `isAuthenticated`.
+2. Components needing profile details use `user`.
+3. Avoid component-level duplicate `/me` fetches.
+
+#### Phase 8: Verification and resilience
+
+1. Validate initial load with existing cookie hydrates state via `/me`.
+2. Validate login updates header without full reload.
+3. Validate logout clears state and updates UI instantly.
+4. Validate expired session (`401` from `/me`) gracefully falls back to logged-out state.
+5. Run `npm run lint`.
+
+### Verification Checklist
+
+1. Login works and header reflects authenticated state.
+2. Page refresh keeps auth state correct via `/me`.
+3. Logout clears authenticated state in UI.
+4. Components can read auth status from one shared source.
+5. No new lint/type errors are introduced.
+
+### Progress Status
+
+Completed:
+
+- Phase 1: Step 1-3 completed.
+  - Manual dotenv runtime usage removed.
+  - Client auth env naming aligned with `NEXT_PUBLIC_` usage.
+  - Auth endpoint configuration hardened with explicit HTTPS validation.
+- Phase 2: Step 1-3 completed.
+  - `login`, `signUp`, `getMe`, and `logout` are centralized in `src/services/authService.tsx`.
+  - `src/services/serviceBase.tsx` remains transport-focused.
+  - Auth error handling is standardized.
+- Phase 3: Step 1-3 completed.
+  - `src/contexts/AuthContext.tsx` added with `user`, `isLoading`, `isAuthenticated`, `refreshMe`, `loginAction`, `logoutAction`, and `setUser`.
+  - Provider hydrates auth state from `/me` on mount.
+- Phase 4: Step 1 completed.
+  - Root layout now wraps app content in `AuthProvider`.
+- Phase 5: Step 1-2 completed.
+  - Login form uses context `loginAction`.
+  - Signup keeps current redirect behavior.
+- Phase 6: Step 1-4 completed.
+  - Header now shows login/signup when logged out.
+  - Header shows username + logout button when logged in.
+  - Logout uses context action and clears UI state.
+- Phase 7: Step 1-3 in progress.
+  - `QuizForm` now consumes auth context and gates quiz generation UI.
+  - Login/signup forms now show an "already logged in" message when authenticated.
+- Phase 8: Step 5 completed.
+  - `npm run lint` runs with no errors (one existing warning intentionally kept in header).
+- Build verification completed.
+  - `npm run build` succeeds and app routes compile correctly (`/`, `/login`, `/signup`, `/api/quiz/pdf`).
+
+Remaining:
+
+- Phase 8: Step 1-4 manual runtime validation in browser (cookie hydration on refresh, logout behavior, expired session fallback).
+
+### Out of Scope (for this plan)
+
+- Middleware/route-guard redirects
+- Full server-side route protection
+- Replacing cookie auth strategy

@@ -1,5 +1,18 @@
 import { LoginRequest, SignUpRequest } from "@/models/types";
-import { log } from "console";
+
+const getRequiredHttpsUrl = (value: string | undefined, envName: string) => {
+  const trimmed = value?.trim() ?? "";
+
+  if (!trimmed) {
+    throw new Error(`${envName} is missing. Add it to your .env file.`);
+  }
+
+  if (!trimmed.startsWith("https://")) {
+    throw new Error(`${envName} must start with https://`);
+  }
+
+  return trimmed;
+};
 
 export const getData = async (
   url: string,
@@ -25,7 +38,10 @@ export const postData = async (url: string, body: unknown) => {
   });
 };
 
-const loginURI = process.env.NEXT_PUBLIC_LOGIN_URL || "default-url";
+const loginURI = getRequiredHttpsUrl(
+  process.env.NEXT_PUBLIC_LOGIN_URL,
+  "NEXT_PUBLIC_LOGIN_URL",
+);
 
 export const loginUser = async (body: LoginRequest) => {
   return await fetch(loginURI, {
@@ -36,7 +52,10 @@ export const loginUser = async (body: LoginRequest) => {
   });
 };
 
-const signUpURL = process.env.NEXT_PUBLIC_SIGNUP_URL || "default-url";
+const signUpURL = getRequiredHttpsUrl(
+  process.env.NEXT_PUBLIC_SIGNUP_URL,
+  "NEXT_PUBLIC_SIGNUP_URL",
+);
 
 export const signUpUser = async (body: SignUpRequest) => {
   return await fetch(signUpURL, {

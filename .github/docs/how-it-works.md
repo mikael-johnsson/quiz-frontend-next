@@ -107,7 +107,7 @@ Calls `getData`, checks the response, parses the JSON, and returns a `QuestionRe
 
 Once `getQuestions()` resolves, `Quiz` maps over the `questions` array and renders each one as a row with the question text and its answer.
 
-### 5. PDF download flow (`/api/quiz/pdf`)
+### 5. PDF download flow (`/quiz/pdf`)
 
 When the quiz is visible, `Quiz` also renders a **"Ladda ner PDF"** link.
 

@@ -1,18 +1,5 @@
 import { LoginRequest, SignUpRequest } from "@/models/types";
-
-const getRequiredHttpsUrl = (value: string | undefined, envName: string) => {
-  const trimmed = value?.trim() ?? "";
-
-  if (!trimmed) {
-    throw new Error(`${envName} is missing. Add it to your .env file.`);
-  }
-
-  if (!trimmed.startsWith("https://")) {
-    throw new Error(`${envName} must start with https://`);
-  }
-
-  return trimmed;
-};
+import { getRequiredHttpsUrl } from "./utils/httpHelpers";
 
 export const getData = async (
   url: string,

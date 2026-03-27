@@ -1,50 +1,12 @@
 import { AuthResponse, LoginRequest, SignUpRequest } from "@/models/types";
 import { loginUser, signUpUser } from "./serviceBase";
+import { getErrorMessage, getRequiredHttpsUrl } from "./utils/httpHelpers";
 
 const STATUS_MESSAGES: Record<number, string> = {
   400: "Invalid request",
   401: "You are not authenticated",
   409: "A user with this data already exists",
   500: "Server error. Please try again later",
-};
-
-const getRequiredHttpsUrl = (value: string | undefined, envName: string) => {
-  const trimmed = value?.trim() ?? "";
-
-  if (!trimmed) {
-    throw new Error(`${envName} is missing. Add it to your .env file.`);
-  }
-
-  if (!trimmed.startsWith("https://")) {
-    throw new Error(`${envName} must start with https://`);
-  }
-
-  return trimmed;
-};
-
-const getErrorMessage = async (res: Response, fallbackMessage: string) => {
-  const mappedStatusMessage = STATUS_MESSAGES[res.status];
-  const contentType = res.headers.get("content-type") ?? "";
-
-  try {
-    if (contentType.includes("application/json")) {
-      const json = (await res.json()) as { message?: string; error?: string };
-      const jsonMessage = json.message ?? json.error;
-
-      if (jsonMessage && jsonMessage.trim().length > 0) {
-        return jsonMessage;
-      }
-    } else {
-      const text = await res.text();
-      if (text.trim().length > 0) {
-        return text;
-      }
-    }
-  } catch {
-    // Fall back to status-based or generic message when body parsing fails.
-  }
-
-  return mappedStatusMessage ?? fallbackMessage;
 };
 
 /**
@@ -56,7 +18,9 @@ export const login = async (data: LoginRequest): Promise<AuthResponse> => {
   try {
     const res = await loginUser(data);
     if (!res.ok) {
-      throw new Error(await getErrorMessage(res, "Login failed"));
+      throw new Error(
+        await getErrorMessage(res, "Login failed", STATUS_MESSAGES),
+      );
     }
     return res.json() as Promise<AuthResponse>;
   } catch (error) {
@@ -76,7 +40,9 @@ export const signUp = async (data: SignUpRequest) => {
   try {
     const res = await signUpUser(data);
     if (!res.ok) {
-      throw new Error(await getErrorMessage(res, "Sign up failed"));
+      throw new Error(
+        await getErrorMessage(res, "Sign up failed", STATUS_MESSAGES),
+      );
     }
     return res.json() as Promise<AuthResponse>;
   } catch (error) {
@@ -104,7 +70,13 @@ export const getMe = async (): Promise<AuthResponse> => {
     });
 
     if (!res.ok) {
-      throw new Error(await getErrorMessage(res, "Failed to get current user"));
+      throw new Error(
+        await getErrorMessage(
+          res,
+          "Failed to get current user",
+          STATUS_MESSAGES,
+        ),
+      );
     }
 
     const payload = (await res.json()) as {
@@ -147,7 +119,9 @@ export const logout = async (): Promise<void> => {
     });
 
     if (!res.ok) {
-      throw new Error(await getErrorMessage(res, "Logout failed"));
+      throw new Error(
+        await getErrorMessage(res, "Logout failed", STATUS_MESSAGES),
+      );
     }
   } catch (error) {
     if (error instanceof Error) {

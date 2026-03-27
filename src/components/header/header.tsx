@@ -5,19 +5,14 @@ import styles from "./header.module.css";
 import MenuButton from "./components/menuButton";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import QuestionModal from "../questionModal/questionModal";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { user, isLoading, isAuthenticated, logoutAction } = useAuth();
   const menuId = "hamburgerMenu";
-
-  const navClassName = [
-    styles.menu,
-    isMenuOpen ? styles.menuOpen : styles.hidden,
-  ]
-    .filter(Boolean)
-    .join(" ");
 
   const handleMenuToggle = () => {
     setIsMenuOpen((prev) => !prev);
@@ -31,6 +26,14 @@ const Header = () => {
     } finally {
       setIsLoggingOut(false);
     }
+  };
+
+  const openQuestionModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeQuestionModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -60,7 +63,21 @@ const Header = () => {
             </button>
           </>
         )}
+        {!isLoading && isAuthenticated && (
+          <>
+            <button
+              type="button"
+              className={styles.logoutButton}
+              onClick={openQuestionModal}
+            >
+              Skapa fråga
+            </button>
+          </>
+        )}
       </div>
+      {isAuthenticated && (
+        <QuestionModal isOpen={isModalOpen} onClose={closeQuestionModal} />
+      )}
       <MenuButton
         onToggle={handleMenuToggle}
         isOpen={isMenuOpen}
@@ -76,13 +93,17 @@ const Header = () => {
             <Link href="/">PROFIL</Link>
           </li>
           <li>
-            <Link href="/">SKAPA FRÅGA</Link>
-          </li>
-          <li>
             <Link href="/">OM SIDAN</Link>
           </li>
           <li>
-            <Link href="/auth">LOGGA IN / SKAPA KONTO</Link>
+            <Link href="/login" className={styles.authLink}>
+              Logga in
+            </Link>
+            </li>
+            <li>
+            <Link href="/signup" className={styles.authLink}>
+              Skapa konto
+            </Link>
           </li>
         </ul>
       </nav> */}

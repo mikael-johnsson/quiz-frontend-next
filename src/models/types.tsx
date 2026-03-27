@@ -9,7 +9,7 @@ export type Question = {
   questionType: string;
   isApproved: boolean;
   themes: string[];
-  difficultyLevel: string;
+  difficulty: string;
   createdBy: string;
   createdWhen: string;
   id: number;
@@ -36,4 +36,14 @@ export type AuthResponse = {
   id: number;
   email: string;
   firstname: string;
+};
+
+/* Data sent to the server when creating a new quiz question */
+export type PostQuestionRequest = {
+  question: string;
+  answer: string;
+  questionType: string;
+  themes: string[];
+  difficulty: string;
+  createdBy: number;
 };

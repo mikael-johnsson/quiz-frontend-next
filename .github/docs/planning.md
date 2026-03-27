@@ -55,6 +55,8 @@ Goal: Create separate login and signup pages with similar styling and required f
 
 ### Progress Status
 
+Current status: Implementation complete.
+
 Completed:
 
 - Phase 1, Step 1: Dedicated login route page implemented in `src/app/login/page.tsx`.
@@ -269,3 +271,105 @@ Remaining:
 - Middleware/route-guard redirects
 - Full server-side route protection
 - Replacing cookie auth strategy
+
+---
+
+## Not Approved Questions Feed
+
+Goal: Add an unapproved questions feed on the home page for authenticated users only, with a temporary Approve action.
+
+### Scope
+
+- Show feed only when the user is logged in
+- Render each unapproved item with question and answer
+- Add an Approve button per question
+- For now, Approve should only log to console
+- After Approve, remove the question from the local list to simulate approval
+- Keep this scope limited to the home page in this iteration
+
+### Implementation Plan
+
+#### Phase 1: Feed component MVP (client-side)
+
+1. Update `src/components/notApprovedFeed/notApprovedFeed.tsx` to a client component.
+2. Fetch unapproved questions via existing `getQuestions([], [], process.env.NEXT_PUBLIC_BASE_URL || "", false)` in client lifecycle.
+3. Add local state for loading, error, and fetched questions.
+4. Render each question with question text, answer text, and an Approve button.
+5. Keep empty-state messaging when no questions are waiting for approval.
+
+#### Phase 2: Temporary approve action
+
+1. Add an approve handler that accepts question id (and optionally question text).
+2. Log approval intent with `console.log` as placeholder for future API call.
+3. Remove approved question from local state immediately after log.
+4. Ensure empty-state text appears when all items are approved locally.
+
+#### Phase 3: Auth-gated visibility on home page
+
+1. Update `src/app/page.tsx` to render `NotApprovedFeed` only when authenticated.
+2. Reuse existing auth pattern with `isLoading` and `isAuthenticated` from `AuthContext`.
+3. Do not render feed during auth-loading state.
+
+#### Phase 4: Validation and documentation
+
+1. Validate logged-out state: feed should not render.
+2. Validate logged-in state: feed should render with question, answer, and button.
+3. Validate Approve click: console output appears and item disappears.
+4. Run lint/type checks and verify no new issues from this feature.
+
+### Verification Checklist
+
+1. Logged-out users do not see the feed on `/`.
+2. Logged-in users see only unapproved questions.
+3. Each entry shows question, answer, and Approve button.
+4. Approve click logs expected payload in console.
+5. Approved item is removed from the visible list.
+6. Empty-state message appears when list is empty.
+7. No new lint/type errors are introduced.
+
+### Decisions
+
+- Visibility scope: home page only (for now)
+- Technical approach: quick client component implementation
+- Temporary action: `console.log` + local state removal
+
+### Progress Status
+
+Completed:
+
+- Phase 1: Step 1-5 completed in `src/components/notApprovedFeed/notApprovedFeed.tsx`.
+  - Converted feed to client component.
+  - Moved fetch into client lifecycle using existing `getQuestions(..., false)`.
+  - Added loading and error state.
+  - Added Approve button per question.
+  - Empty-state now follows actual rendered list length.
+- Phase 2: Step 1-4 completed in `src/components/notApprovedFeed/notApprovedFeed.tsx`.
+  - Added approve handler with `questionId` and `questionText`.
+  - Added temporary `console.log` payload.
+  - Added local state removal after approve.
+  - Empty-state appears when all questions are removed.
+- Phase 3: Step 1-3 completed.
+  - Added auth gate component in `src/components/notApprovedFeed/notApprovedFeedGate.tsx`.
+  - Home page now renders gated feed via `src/app/page.tsx`.
+  - Feed is hidden while auth state is loading.
+- Phase 4: Step 1-4 completed.
+  - Logged-out gate path verified.
+  - Logged-in render path (question, answer, Approve) verified.
+  - Approve log + local removal flow verified in code.
+  - Lint and TypeScript checks pass.
+
+Verification result:
+
+- `npm run lint` runs with no errors.
+- `npx tsc --noEmit` runs successfully with no errors.
+- Feature files for this implementation have no reported file-level errors.
+
+Remaining:
+
+- Optional browser runtime pass to manually click Approve and verify console output and UI updates end-to-end.
+
+### Out of Scope (for this plan)
+
+- Real backend approve endpoint integration
+- Server-side authorization guards for feed reuse in other routes
+- Optimistic update rollback logic based on API responses

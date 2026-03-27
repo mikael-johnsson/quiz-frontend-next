@@ -5,8 +5,9 @@ export const getData = async (
   url: string,
   themesUrl: string,
   difficultiesUrl: string,
+  isApprovedUrl: string,
 ) => {
-  return fetch(`${url}${themesUrl}${difficultiesUrl}`, {
+  return fetch(`${url}${themesUrl}${difficultiesUrl}${isApprovedUrl}`, {
     credentials: "include",
   });
 };

@@ -33,11 +33,13 @@ export const getQuestions = async (
   themes: string[],
   difficulties: string[],
   URL: string,
+  isApproved: boolean = true,
 ) => {
   const difficultiesUrl = buildUrl(difficulties, "&difficulties=");
   const themesUrl = buildUrl(themes, "&themes=");
+  const isApprovedUrl = `&isApproved=${isApproved}`;
 
-  const res = await getData(URL, themesUrl, difficultiesUrl);
+  const res = await getData(URL, themesUrl, difficultiesUrl, isApprovedUrl);
   if (!res.ok) {
     console.log("error");
     // add error message

@@ -3,6 +3,7 @@ import styles from "./page.module.css";
 import QuizForm from "@/components/quizForm/quizForm";
 import Quiz from "@/components/quiz/quiz";
 import { normalizeArray } from "@/lib/utils";
+import NotApprovedFeedGate from "@/components/notApprovedFeed/notApprovedFeedGate";
 
 const BASE_URL = process.env.BASE_URL || "";
 
@@ -25,6 +26,7 @@ export default async function Home({ searchParams }: PageProps) {
   return (
     <main className={styles.main}>
       <LandingAside />
+      <NotApprovedFeedGate />
       <section className={styles.section}>
         <h1 className={styles.h1}>Skapa ditt quiz direkt!</h1>
         <QuizForm />

@@ -3,7 +3,7 @@ import { getData, postData } from "./serviceBase";
 import { buildUrl } from "./utils/buildUrl";
 import { getErrorMessage, getRequiredHttpsUrl } from "./utils/httpHelpers";
 
-const PDF_URL = process.env.PDF_URL || "";
+const NEXT_PUBLIC_PDF_URL = process.env.NEXT_PUBLIC_PDF_URL || "";
 const STATUS_MESSAGES: Record<number, string> = {
   400: "Invalid question data",
   401: "You are not authenticated",
@@ -61,7 +61,7 @@ export const getPdf = async (themes: string[], difficulties: string[]) => {
     .filter((difficulty) => difficulty.length > 0)
     .forEach((difficulty) => queryParams.append("difficulties", difficulty));
 
-  const res = await fetch(`${PDF_URL}?${queryParams.toString()}`, {
+  const res = await fetch(`${NEXT_PUBLIC_PDF_URL}?${queryParams.toString()}`, {
     method: "GET",
     cache: "no-store",
     credentials: "include",

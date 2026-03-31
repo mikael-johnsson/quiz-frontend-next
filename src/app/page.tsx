@@ -5,7 +5,7 @@ import Quiz from "@/components/quiz/quiz";
 import { normalizeArray } from "@/lib/utils";
 import NotApprovedFeedGate from "@/components/notApprovedFeed/notApprovedFeedGate";
 
-const BASE_URL = process.env.BASE_URL || "";
+const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "";
 
 type PageProps = {
   searchParams: Promise<{
@@ -31,7 +31,11 @@ export default async function Home({ searchParams }: PageProps) {
         <h1 className={styles.h1}>Skapa ditt quiz direkt!</h1>
         <QuizForm />
         {hasGenerated && (
-          <Quiz themes={themes} difficulties={difficulties} url={BASE_URL} />
+          <Quiz
+            themes={themes}
+            difficulties={difficulties}
+            url={NEXT_PUBLIC_BASE_URL}
+          />
         )}
       </section>
     </main>

@@ -119,3 +119,40 @@ export const postQuestion = async (
 ) => {
   return createQuestion(questionData, URL);
 };
+
+export const updateIsApproved = async (questionId: number, url: string) => {
+  const resolvedUrl = url.trim().length > 0 ? url : "";
+  if (!resolvedUrl) {
+    throw new Error("URL is required to update question approval status");
+  }
+
+  const newresolvedUrl = resolvedUrl.replace("?", "");
+
+  try {
+    const res = await fetch(`${newresolvedUrl}/${questionId.toString()}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      throw new Error(
+        await getErrorMessage(
+          res,
+          "Failed to update question approval status",
+          STATUS_MESSAGES,
+        ),
+      );
+    }
+
+    return res;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+
+    throw new Error("Network error while updating question approval status");
+  }
+};

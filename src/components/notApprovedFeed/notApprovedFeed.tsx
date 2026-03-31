@@ -11,6 +11,7 @@ const NotApprovedFeed = () => {
   const [data, setData] = useState<QuestionResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isFeedVisible, setIsFeedVisible] = useState(true);
 
   const handleApprove = async (questionId: number, questionText: string) => {
     const res = await updateIsApproved(questionId, NEXT_PUBLIC_BASE_URL || "");
@@ -61,9 +62,30 @@ const NotApprovedFeed = () => {
     return <p>Inga frågor väntar på godkännande</p>;
   }
 
+  if (!isFeedVisible) {
+    return (
+      <button
+        type="button"
+        className={styles.toggleButton}
+        onClick={() => setIsFeedVisible(true)}
+      >
+        Visa icke godkända frågor
+      </button>
+    );
+  }
+
   return (
     <div className={styles.container}>
-      <h3>Frågor väntande på godkännande</h3>
+      <div className={styles.header}>
+        <h3>Frågor väntande på godkännande</h3>
+        <button
+          type="button"
+          className={styles.hideButton}
+          onClick={() => setIsFeedVisible(false)}
+        >
+          Dölj feed
+        </button>
+      </div>
       {data.questions.map((q) => (
         <div key={q.id} className={styles.questionItem}>
           <div className={styles.questionContent}>

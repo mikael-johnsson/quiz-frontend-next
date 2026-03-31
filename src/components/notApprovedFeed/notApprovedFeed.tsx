@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { QuestionResponse } from "@/models/types";
 import { getQuestions, updateIsApproved } from "@/services/quizService";
+import styles from "./notApprovedFeed.module.css";
 
 const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "";
 
@@ -61,13 +62,19 @@ const NotApprovedFeed = () => {
   }
 
   return (
-    <div>
+    <div className={styles.container}>
       <h3>Frågor väntande på godkännande</h3>
       {data.questions.map((q) => (
-        <div key={q.id}>
-          <h3>{q.question}</h3>
-          <p>{q.answer}</p>
-          <button type="button" onClick={() => handleApprove(q.id, q.question)}>
+        <div key={q.id} className={styles.questionItem}>
+          <div className={styles.questionContent}>
+            <h3>{q.question}</h3>
+            <p>{q.answer}</p>
+          </div>
+          <button
+            type="button"
+            className={styles.approveButton}
+            onClick={() => handleApprove(q.id, q.question)}
+          >
             Approve
           </button>
         </div>

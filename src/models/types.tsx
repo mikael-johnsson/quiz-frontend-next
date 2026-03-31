@@ -15,6 +15,18 @@ export type Question = {
   id: number;
 };
 
+/**
+ * Stores the exact quiz selection rendered in the UI,
+ * so later actions (like PDF download) can reference the same question IDs.
+ */
+export type QuizSnapshot = {
+  version: number;
+  createdAt: string;
+  questionIds: number[];
+  themes: string[];
+  difficulties: string[];
+};
+
 // --- Auth types ---
 
 /** Data sent to the server when a user logs in */

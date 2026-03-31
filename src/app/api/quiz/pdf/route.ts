@@ -7,15 +7,26 @@ const getNonEmptyValues = (values: string[]) => {
     .filter((value) => value.length > 0);
 };
 
+const getPositiveIntegerValues = (values: string[]) => {
+  return values
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0)
+    .map((value) => Number.parseInt(value, 10))
+    .filter((value) => Number.isInteger(value) && value > 0);
+};
+
 export async function GET(request: Request) {
   const incomingParams = new URL(request.url).searchParams;
 
   // Query params can be repeated in the URL: ?themes=history&themes=science
   const themes = getNonEmptyValues(incomingParams.getAll("themes"));
   const difficulties = getNonEmptyValues(incomingParams.getAll("difficulties"));
+  const questionIds = getPositiveIntegerValues(
+    incomingParams.getAll("questionIds"),
+  );
 
   try {
-    const upstreamResponse = await getPdf(themes, difficulties);
+    const upstreamResponse = await getPdf(themes, difficulties, questionIds);
 
     if (!upstreamResponse.ok) {
       return NextResponse.json(

@@ -1,6 +1,6 @@
 import { getQuestions } from "@/services/quizService";
 import styles from "./quiz.module.css";
-import Link from "next/link";
+import QuizActions from "./quizActions";
 
 type QuizProps = {
   themes: string[];
@@ -14,28 +14,17 @@ const Quiz = async ({
   url = "",
 }: QuizProps) => {
   const data = await getQuestions(themes, difficulties, url);
-  const pdfParams = new URLSearchParams();
-
-  themes.forEach((theme) => pdfParams.append("themes", theme));
-  difficulties.forEach((difficulty) =>
-    pdfParams.append("difficulties", difficulty),
-  );
-
-  const pdfDownloadHref = `/quiz/pdf?${pdfParams.toString()}`;
   const questions = data.questions;
   return (
     <>
       {/* Navigating to /?generate=false causes Home to set hasGenerated=false,
           which unmounts this entire Quiz component and clears both
           the message container and the questions list */}
-      <div className={styles.actionsContainer}>
-        <Link href="/?generate=false" className={styles.clearButton}>
-          Rensa quiz
-        </Link>
-        <a href={pdfDownloadHref} className={styles.downloadButton}>
-          Ladda ner PDF
-        </a>
-      </div>
+      <QuizActions
+        questions={questions}
+        themes={themes}
+        difficulties={difficulties}
+      />
       <div className={styles.messageContainer}>
         <h3 className={styles.heading}>Din sökning</h3>
         <div>

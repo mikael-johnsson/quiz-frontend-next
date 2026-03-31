@@ -48,8 +48,23 @@ export const getQuestions = async (
   return data;
 };
 
-export const getPdf = async (themes: string[], difficulties: string[]) => {
+/**
+ * Requests a quiz PDF from the upstream service.
+ * `questionIds` is optional and keeps backward compatibility with existing
+ * filter-based generation when IDs are not provided.
+ */
+export const getPdf = async (
+  themes: string[],
+  difficulties: string[],
+  questionIds: number[] = [],
+) => {
   const queryParams = new URLSearchParams();
+
+  questionIds
+    .filter((questionId) => Number.isInteger(questionId) && questionId > 0)
+    .forEach((questionId) =>
+      queryParams.append("questionIds", questionId.toString()),
+    );
 
   themes
     .map((theme) => theme.trim())
@@ -61,11 +76,14 @@ export const getPdf = async (themes: string[], difficulties: string[]) => {
     .filter((difficulty) => difficulty.length > 0)
     .forEach((difficulty) => queryParams.append("difficulties", difficulty));
 
+  console.log(`PDF URL: ${NEXT_PUBLIC_PDF_URL}?${queryParams.toString()}`);
+
   const res = await fetch(`${NEXT_PUBLIC_PDF_URL}?${queryParams.toString()}`, {
     method: "GET",
     cache: "no-store",
     credentials: "include",
   });
+  console.log("PDF response status:", res);
 
   if (!res.ok) {
     console.log("error");

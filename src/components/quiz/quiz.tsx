@@ -46,6 +46,15 @@ const Quiz = async ({
           <div className={styles.row} key={q.id}>
             <div className={styles.question}>{q.question}</div>
             <div className={styles.answer}>{q.answer}</div>
+            <div>
+              <span>Svårighetsgrad: {q.difficulty}</span>
+              <div>
+                Teman:{" "}
+                {q.themes.map((theme) => (
+                  <span>{theme} </span>
+                ))}
+              </div>
+            </div>
           </div>
         ))}
         <div></div>

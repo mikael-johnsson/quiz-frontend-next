@@ -51,7 +51,7 @@ const Quiz = async ({
               <div>
                 Teman:{" "}
                 {q.themes.map((theme) => (
-                  <span>{theme} </span>
+                  <span key={theme}>{theme} </span>
                 ))}
               </div>
             </div>

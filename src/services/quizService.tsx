@@ -1,4 +1,9 @@
-import { PostQuestionRequest, QuestionResponse } from "../models/types";
+import {
+  PostQuestionRequest,
+  QuestionResponse,
+  UpdateQuestionRequest,
+  UserQuestionQueryOptions,
+} from "../models/types";
 import { getData, postData } from "./serviceBase";
 import { buildUrl } from "./utils/buildUrl";
 import { getErrorMessage, getRequiredHttpsUrl } from "./utils/httpHelpers";
@@ -12,13 +17,10 @@ const STATUS_MESSAGES: Record<number, string> = {
 };
 
 const getQuestionsUrl = () => {
-  const explicitQuestionsUrl = process.env.NEXT_PUBLIC_QUESTIONS_URL;
+  const explicitQuestionsUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   if (explicitQuestionsUrl?.trim()) {
-    return getRequiredHttpsUrl(
-      explicitQuestionsUrl,
-      "NEXT_PUBLIC_QUESTIONS_URL",
-    );
+    return getRequiredHttpsUrl(explicitQuestionsUrl, "NEXT_PUBLIC_BASE_URL");
   }
 
   const baseUrl = getRequiredHttpsUrl(
@@ -44,6 +46,61 @@ export const getQuestions = async (
     console.log("error");
     // add error message
   }
+  const data: QuestionResponse = await res.json();
+  return data;
+};
+
+/**
+ * Fetches questions created by a specific user.
+ * This is used by the profile dashboard to show the logged-in user's contributions.
+ */
+export const getUserQuestions = async (
+  userId: string,
+  options: UserQuestionQueryOptions = {},
+) => {
+  const queryParams = new URLSearchParams();
+
+  queryParams.set("createdBy", userId);
+
+  if (typeof options.page === "number" && options.page > 0) {
+    queryParams.set("page", options.page.toString());
+  }
+
+  if (typeof options.isApproved === "boolean") {
+    queryParams.set("isApproved", options.isApproved.toString());
+  }
+
+  options.themes
+    ?.map((theme) => theme.trim())
+    .filter((theme) => theme.length > 0)
+    .forEach((theme) => queryParams.append("themes", theme));
+
+  options.difficulties
+    ?.map((difficulty) => difficulty.trim())
+    .filter((difficulty) => difficulty.length > 0)
+    .forEach((difficulty) => queryParams.append("difficulties", difficulty));
+
+  if (options.search?.trim()) {
+    queryParams.set("search", options.search.trim());
+  }
+
+  const questionsUrl = getQuestionsUrl();
+  const res = await fetch(`${questionsUrl}?${queryParams.toString()}`, {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error(
+      await getErrorMessage(
+        res,
+        "Failed to load user questions",
+        STATUS_MESSAGES,
+      ),
+    );
+  }
+
   const data: QuestionResponse = await res.json();
   return data;
 };
@@ -94,7 +151,7 @@ export const getPdf = async (
 
 /**
  * Creates a new question for the authenticated user.
- * Uses NEXT_PUBLIC_QUESTIONS_URL when available, otherwise falls back to NEXT_PUBLIC_BASE_URL + /questions.
+ * Uses NEXT_PUBLIC_BASE_URL when available
  */
 export const createQuestion = async (
   questionData: PostQuestionRequest,
@@ -136,6 +193,82 @@ export const postQuestion = async (
   questionData: PostQuestionRequest,
 ) => {
   return createQuestion(questionData, URL);
+};
+
+/**
+ * Updates an existing question created by the authenticated user.
+ */
+export const updateQuestion = async (
+  questionId: number,
+  questionData: UpdateQuestionRequest,
+) => {
+  // doesnt work in this function right now
+  // const questionsUrl = getQuestionsUrl();
+  const questionsUrl = process.env.NEXT_PUBLIC_QUESTION_EDIT_URL;
+
+  try {
+    // this is to accomodate backend, should be fixed to look better
+    const questionObject = {
+      question: questionData,
+    };
+
+    const res = await fetch(`${questionsUrl}/${questionId.toString()}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(questionObject),
+      credentials: "include",
+    });
+    if (!res.ok) {
+      throw new Error(
+        await getErrorMessage(
+          res,
+          "Failed to update question",
+          STATUS_MESSAGES,
+        ),
+      );
+    }
+    return res;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+
+    throw new Error("Network error while updating question");
+  }
+};
+
+/**
+ * Deletes an existing question created by the authenticated user.
+ */
+export const deleteQuestion = async (questionId: number) => {
+  const questionsUrl = getQuestionsUrl();
+
+  try {
+    const res = await fetch(`${questionsUrl}/${questionId.toString()}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      throw new Error(
+        await getErrorMessage(
+          res,
+          "Failed to delete question",
+          STATUS_MESSAGES,
+        ),
+      );
+    }
+
+    return res;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+
+    throw new Error("Network error while deleting question");
+  }
 };
 
 export const updateIsApproved = async (questionId: number, url: string) => {

@@ -45,9 +45,29 @@ export type SignUpRequest = {
 
 /** Shape of the response the server sends back after a successful login or sign-up */
 export type AuthResponse = {
-  id: number;
+  id: string;
   email: string;
   firstname: string;
+};
+
+/** Data sent to the server when a user changes their password */
+export type PasswordChangeRequest = {
+  email: string;
+  currentPassword: string;
+  newPassword: string;
+};
+
+/**
+ * Query options for listing a single user's created questions.
+ * This keeps filtering consistent between the profile dashboard,
+ * the service layer, and the backend endpoint.
+ */
+export type UserQuestionQueryOptions = {
+  page?: number;
+  isApproved?: boolean;
+  themes?: string[];
+  difficulties?: string[];
+  search?: string;
 };
 
 /* Data sent to the server when creating a new quiz question */
@@ -57,5 +77,17 @@ export type PostQuestionRequest = {
   questionType: string;
   themes: string[];
   difficulty: string;
-  createdBy: number;
+  createdBy: string;
+};
+
+/* Data sent to the server when updating a quiz question */
+export type UpdateQuestionRequest = {
+  id: number;
+  question: string;
+  answer: string;
+  questionType: string;
+  themes: string[];
+  difficulty: string;
+  createdBy: string;
+  createdWhen: string;
 };

@@ -63,7 +63,7 @@ const LoginForm = () => {
     return (
       <div className={styles.card}>
         <h2 className={styles.heading}>Logga in</h2>
-        <p>Du ar redan inloggad.</p>
+        <p>Du är redan inloggad.</p>
         <p>
           Gå till <Link href="/">startsidan</Link>.
         </p>

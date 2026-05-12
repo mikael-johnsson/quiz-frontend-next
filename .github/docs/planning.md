@@ -4,84 +4,220 @@ A living document tracking planned and in-progress features.
 
 ---
 
-## Plan: Quiz/PDF Consistency (Step-by-Step)
+## Profile Page
 
-This is an incremental frontend-first plan that keeps the current GET contract, adds question-ID snapshot support, and preserves safe fallback behavior.
+Personal dashboard for authenticated users to manage their profile and track their activity on the platform.
+
+### Features
+
+#### 1. User's Contribution Dashboard
+
+Show stats and a list of questions the logged-in user has created.
+
+**Functionality:**
+
+- Total questions created count
+- Number of approved vs. pending approval questions
+- List of user's questions with status badges (approved/pending)
+- Option to edit/delete their own questions
+- Optional: themes and difficulty distribution visualization
+
+**Why:** Users who contribute content want to see their impact and track submission status.
+
+---
+
+#### 2. User's Quiz Activity & History
+
+Display personalized quiz statistics and activity tracking.
+
+**Functionality:**
+
+- Quizzes taken (count and dates)
+- Favorite themes/difficulties based on activity
+- Recent quiz results or completion metrics
+- Option to save/bookmark certain quiz combinations for quick access
+- Time spent on quizzes (if tracked by backend)
+
+**Why:** Activity tracking and quick-access to favorite configurations improves user engagement and reduces friction.
+
+---
+
+#### 3. Profile Settings & Preferences
+
+Basic profile management for the logged-in user.
+
+**Functionality:**
+
+- Display full name (firstname from auth context)
+- Email address display
+- Password change option
+- Optional: Default quiz preferences (preferred themes/difficulties)
+
+**Why:** Standard user account management; gives users control over their profile.
+
+### Constraints
+
+- Personal dashboard only (no public user profiles or social features at this stage)
+- Use only `firstname` from AuthResponse (do not add lastname for now)
+
+### Related files
+
+- [src/app/profile/[id]/page.tsx](src/app/profile/[id]/page.tsx): Profile page component
+- [src/contexts/AuthContext.tsx](src/contexts/AuthContext.tsx): User authentication and data
+- [src/models/types.tsx](src/models/types.tsx): Type definitions
+
+---
+
+## Implementation: Profile Settings & Preferences (Step-by-Step)
+
+Incremental implementation of feature #3: Profile Settings & Preferences.
 
 ### Step-by-step execution with checkpoints
 
-1. Step 1: Add snapshot type in [src/models/types.tsx](src/models/types.tsx).
-   Define QuizSnapshot with fields: version, createdAt, questionIds, themes, difficulties.
-   Checkpoint: Type compiles and is exported.
+1. Step 1: Create profile page layout and display user info.
+   Convert ProfilePage from "use client" to display basic user information (firstname, email) from useAuth hook.
+   Display in a simple two-column layout: label on left, value on right.
+   Checkpoint: Profile page displays firstname and email from authenticated user without errors.
 
-2. Step 2: Add storage utilities in [src/lib/utils.tsx](src/lib/utils.tsx).
-   Implement saveQuizSnapshot, readQuizSnapshot, clearQuizSnapshot, and isSnapshotFresh (TTL-based).
-   Checkpoint: Utility functions handle malformed JSON and unavailable storage without crashing.
+2. Step 2: Create password change form component.
+   Create new component [src/components/profileSettings/passwordChangeForm.tsx](src/components/profileSettings/passwordChangeForm.tsx).
+   Form should have three fields: current password, new password, confirm new password.
+   Make it a client component.
+   Checkpoint: Form renders with three input fields and a submit button.
 
-3. Step 3: Add client action wrapper for quiz actions.
-   Create a small client component (for example QuizActions) under [src/components/quiz](src/components/quiz) that receives questions, themes, and difficulties.
-   Checkpoint: Existing UI still renders Rensa quiz and Ladda ner PDF.
+3. Step 3: Add form validation for password change.
+   Add client-side validation:
+   - Current password is required
+   - New password is required and must be at least 8 characters
+   - Confirm password matches new password
+   - Display validation error messages below each field
+     Checkpoint: Form shows appropriate error messages when user tries to submit invalid data.
 
-4. Step 4: Persist rendered snapshot from the client wrapper.
-   On mount/update, save the exact rendered question IDs and filters to storage.
-   Checkpoint: After generating a quiz, snapshot in storage matches the visible questions.
+4. Step 4: Extend types for password change request.
+   Add new type `PasswordChangeRequest` in [src/models/types.tsx](src/models/types.tsx) with fields: currentPassword, newPassword.
+   Checkpoint: Type is exported and available for use.
 
-5. Step 5: Clear snapshot on reset flow.
-   When user clicks Rensa quiz, clear snapshot before navigation.
-   Checkpoint: Storage key is removed when quiz is cleared.
+5. Step 5: Add password change API function.
+   Add new function `changePassword` in [src/services/authService.tsx](src/services/authService.tsx) that POST to backend endpoint (e.g., `/auth/change-password`).
+   Checkpoint: Function accepts PasswordChangeRequest and returns response.
 
-6. Step 6: Build forward-compatible PDF query.
-   Generate PDF URL with repeated questionIds plus existing themes and difficulties.
-   Checkpoint: Browser network request includes questionIds in query string.
+6. Step 6: Implement form submission handling.
+   Connect password change form submit button to call changePassword function from authService.
+   Show loading state while request is in flight.
+   Show success or error message to user after submission.
+   Clear form fields on successful password change.
+   Checkpoint: Form can submit, shows loading state, and displays success/error messages.
 
-7. Step 7: Extend route parsing in [src/app/api/quiz/pdf/route.ts](src/app/api/quiz/pdf/route.ts).
-   Parse optional repeated questionIds, validate as positive integers, and keep current behavior when missing.
-   Checkpoint: Route handles both old and new query formats.
+7. Step 7: Add password change form to profile page.
+   Integrate passwordChangeForm component into the profile page layout below user info.
+   Use flex layout to organize sections vertically.
+   Checkpoint: Password change form appears on profile page below user info section.
 
-8. Step 8: Extend service call shape in [src/services/quizService.tsx](src/services/quizService.tsx).
-   Allow optional questionIds argument for PDF requests and forward params consistently.
-   Checkpoint: No regression for existing callers that pass only filters.
+8. Step 8: Create quiz preferences form component (optional).
+   Create new component [src/components/profileSettings/quizPreferencesForm.tsx](src/components/profileSettings/quizPreferencesForm.tsx).
+   Display multi-select dropdowns for preferred themes and difficulties.
+   This is future-proofing; values may not be persisted to backend yet.
+   Checkpoint: Component renders with theme and difficulty selectors.
 
-9. Step 9: Add user-facing fallback behavior.
-   If snapshot is missing or stale, keep download enabled but show a brief warning that fallback filter-based PDF is used.
-   Checkpoint: User receives predictable behavior instead of silent mismatch risk.
+9. Step 9: Add styling to profile page.
+   Create [src/app/profile/profile.module.css](src/app/profile/profile.module.css) with:
+   - Container layout (flex, max-width, centered)
+   - Section spacing and borders
+   - Form field styling
+   - Button styling (consistent with rest of app)
+     Checkpoint: Profile page looks polished and matches app styling conventions.
 
-10. Step 10: Verify with manual and automated checks.
-    Manual checks: generate -> inspect storage -> download -> clear.
-    Add unit tests for storage parse/TTL and route parsing where test setup already exists.
-    Checkpoint: All relevant tests pass, and manual checks confirm expected flow.
-
-11. Step 11: Document current limitation and next step.
-    Document that exact parity requires backend support for honoring questionIds during PDF generation.
-    Checkpoint: Limitation and next backend task are explicitly recorded.
+10. Step 10: Verify implementation.
+    Manual checks:
+    - Navigate to profile page while logged in
+    - Verify user info displays correctly
+    - Test password change form validation
+    - Test successful password change (if backend is ready)
+    - Verify error handling on failed password change
+      Checkpoint: All manual checks pass without console errors.
 
 ### Parallelism and dependencies
 
-1. Can run in parallel: Step 1 and Step 2.
-2. Depends on Step 2: Step 4 and Step 5.
-3. Depends on Step 3: Step 4, Step 5, Step 6.
-4. Depends on Step 6: Step 7 and Step 8.
-5. Final validation after Steps 1-9: Step 10 and Step 11.
-
-### Relevant files
-
-- [src/components/quiz/quiz.tsx](src/components/quiz/quiz.tsx): keep server fetch/render and delegate interactive actions to a client wrapper.
-- [src/components/quiz](src/components/quiz): add new client action component.
-- [src/app/api/quiz/pdf/route.ts](src/app/api/quiz/pdf/route.ts): parse optional questionIds with fallback.
-- [src/services/quizService.tsx](src/services/quizService.tsx): extend getPdf input shape and forwarding logic.
-- [src/models/types.tsx](src/models/types.tsx): snapshot type definition.
-- [src/lib/utils.tsx](src/lib/utils.tsx): safe storage and TTL utilities.
+1. Can run in parallel: Step 1, Step 2, and Step 4.
+2. Depends on Step 2: Step 3 and Step 6.
+3. Depends on Step 5 and Step 6: Step 7.
+4. Can run in parallel with other steps: Step 8 (optional feature).
+5. Final styling: Step 9 (can be done after Step 7 or in parallel).
+6. Verification after Steps 1-9: Step 10.
 
 ### Verification checklist
 
-1. Generate quiz and confirm stored questionIds equal visible IDs.
-2. Download PDF and verify request query contains questionIds and filters.
-3. Clear quiz and confirm snapshot removal.
-4. Simulate stale snapshot and verify warning plus fallback.
-5. Confirm route behaves identically when questionIds are omitted.
+1. Profile page loads without errors when user is authenticated.
+2. Firstname and email display correctly from auth context.
+3. Password change form validates all three fields correctly.
+4. Error messages appear for each validation failure.
+5. Form shows loading state during submission.
+6. Success message displays after successful password change.
+7. Form fields clear after successful submission.
+8. Error message displays if password change fails.
+9. Profile page styling is consistent with app design.
+10. No console errors or TypeScript errors in the component.
 
-### Scope boundaries
+## Implementation: User's Contribution Dashboard (Step-by-Step)
 
-- Included: frontend snapshot, query extension, fallback behavior, and parsing support in local API route.
-- Excluded: upstream backend contract change to POST body/full question payload.
-- Known limitation: parity is not guaranteed until upstream PDF backend uses provided IDs.
+Incremental implementation plan for feature #1: User's Contribution Dashboard.
+
+### Step-by-step execution with checkpoints
+
+1. Step 1: Define requirements & data contracts.
+   - Confirm backend endpoints: `GET /questions?createdBy={id}`, `DELETE /questions/{id}`, `PUT /questions/{id}` (or equivalents).
+   - Confirm auth and authorization behavior for edit/delete.
+   - Check `Question` and `PostQuestionRequest` types for required fields.
+     Checkpoint: API surface and types documented.
+
+2. Step 2: Add service method to fetch user's questions.
+   - Add `getUserQuestions(userId: string, options?)` in [src/services/quizService.tsx](src/services/quizService.tsx).
+   - Support optional pagination, approval filter, themes and difficulty.
+     Checkpoint: Service returns `QuestionResponse` and handles errors.
+
+3. Step 3: Create `ContributionsList` component (client).
+   - New component at [src/components/profile/contributionsList.tsx](src/components/profile/contributionsList.tsx).
+   - Fetch on mount using `getUserQuestions(user.id)` and render list with question, status badge, themes, difficulty, createdWhen.
+   - Provide loading and empty states.
+     Checkpoint: Component renders user's questions.
+
+4. Step 4: Add edit/delete UI and handlers.
+   - Add `Edit` button that opens the existing `questionForm` in edit mode (or a modal).
+   - Add `Delete` button with confirmation; call service to delete and refresh list.
+   - Ensure optimistic UI or loading states on actions.
+     Checkpoint: Edit and delete actions work and refresh list.
+
+5. Step 5: Pagination, filtering and search.
+   - Add simple pagination or “Load more” for long lists.
+   - Add filters for approval status, themes, difficulty, and a search input.
+   - Persist filters in query params or localStorage if useful.
+     Checkpoint: Users can filter and navigate lists.
+
+6. Step 6: Add contribution statistics.
+   - Display totals and approved vs pending counts in a small stats bar.
+   - Optionally show theme/difficulty distribution with simple charts.
+     Checkpoint: Stats reflect list state and update after edits.
+
+7. Step 7: Styling and responsive layout.
+   - Create [src/components/profile/contributionsList.module.css](src/components/profile/contributionsList.module.css) matching app style.
+   - Ensure accessibility for buttons, forms and lists.
+     Checkpoint: Component matches visual conventions and is responsive.
+
+8. Step 8: Tests and verification.
+   - Add unit tests for service parsing and component rendering where practical.
+   - Manual checks: list loads, edit/delete flows, pagination/filters and stats update.
+     Checkpoint: Tests pass and manual checks succeed.
+
+### Parallelism and dependencies
+
+1. Service method (Step 2) can be implemented before the UI (Step 3).
+2. Edit/delete depend on service endpoints for update/delete.
+3. Pagination and filters can be iterated — start with a simple Load More.
+
+### Verification checklist
+
+1. `ContributionsList` loads and displays the user's questions.
+2. Edit and delete actions succeed and refresh the list.
+3. Filters and pagination work as expected.
+4. Statistics update after modifications.
+5. No TypeScript or console errors present.

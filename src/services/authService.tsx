@@ -1,4 +1,9 @@
-import { AuthResponse, LoginRequest, SignUpRequest } from "@/models/types";
+import {
+  AuthResponse,
+  LoginRequest,
+  PasswordChangeRequest,
+  SignUpRequest,
+} from "@/models/types";
 import { loginUser, signUpUser } from "./serviceBase";
 import { getErrorMessage, getRequiredHttpsUrl } from "./utils/httpHelpers";
 
@@ -7,6 +12,24 @@ const STATUS_MESSAGES: Record<number, string> = {
   401: "You are not authenticated",
   409: "A user with this data already exists",
   500: "Server error. Please try again later",
+};
+
+const getChangePasswordUrl = () => {
+  const explicitChangePasswordUrl = process.env.NEXT_PUBLIC_CHANGE_PASSWORD_URL;
+
+  if (explicitChangePasswordUrl?.trim()) {
+    return getRequiredHttpsUrl(
+      explicitChangePasswordUrl,
+      "NEXT_PUBLIC_CHANGE_PASSWORD_URL",
+    );
+  }
+
+  const baseUrl = getRequiredHttpsUrl(
+    process.env.NEXT_PUBLIC_BASE_URL,
+    "NEXT_PUBLIC_BASE_URL",
+  );
+
+  return `${baseUrl.replace(/\/$/, "")}/auth/change-password`;
 };
 
 /**
@@ -54,6 +77,36 @@ export const signUp = async (data: SignUpRequest) => {
 };
 
 /**
+ * Sends the current and new password to the server so the authenticated user can update their password.
+ */
+export const changePassword = async (
+  data: PasswordChangeRequest,
+): Promise<void> => {
+  const changePasswordUrl = getChangePasswordUrl();
+
+  try {
+    const res = await fetch(changePasswordUrl, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      throw new Error(
+        await getErrorMessage(res, "Password change failed", STATUS_MESSAGES),
+      );
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+
+    throw new Error("Network error while changing password");
+  }
+};
+
+/**
  * Gets the currently authenticated user by validating the auth cookie on the backend.
  */
 export const getMe = async (): Promise<AuthResponse> => {
@@ -81,7 +134,7 @@ export const getMe = async (): Promise<AuthResponse> => {
 
     const payload = (await res.json()) as {
       message?: string;
-      payload?: { id: string | number; firstname: string; email: string };
+      payload?: { id: string; firstname: string; email: string };
     };
 
     const user = payload.payload;
@@ -91,7 +144,7 @@ export const getMe = async (): Promise<AuthResponse> => {
     }
 
     return {
-      id: Number(user.id),
+      id: user.id,
       firstname: user.firstname,
       email: user.email,
     };

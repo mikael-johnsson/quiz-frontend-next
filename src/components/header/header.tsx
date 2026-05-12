@@ -38,7 +38,10 @@ const Header = () => {
 
   return (
     <header className={styles.header}>
-      <h2>Quiz-a-nator</h2>
+      <Link href="/">
+        <h2>Quiz-a-nator</h2>
+      </Link>
+
       <div className={styles.authActions}>
         {!isLoading && !isAuthenticated && (
           <>
@@ -50,9 +53,18 @@ const Header = () => {
             </Link>
           </>
         )}
+        {!isLoading && isAuthenticated && user && (
+          <span className={styles.userName}>
+            Inloggad som: {user?.firstname}
+          </span>
+        )}
+        {!isLoading && isAuthenticated && user && (
+          <Link href={`/profile/${user.id}`} className={styles.authLink}>
+            Min sida
+          </Link>
+        )}
         {!isLoading && isAuthenticated && (
           <>
-            <span className={styles.userName}>{user?.firstname}</span>
             <button
               type="button"
               className={styles.logoutButton}
@@ -83,30 +95,6 @@ const Header = () => {
         isOpen={isMenuOpen}
         controlsId={menuId}
       />
-      {/* Not showing since not used
-      <nav id={menuId} className={navClassName}>
-        <ul className={styles.menuList}>
-          <li>
-            <Link href="/">HEM</Link>
-          </li>
-          <li>
-            <Link href="/">PROFIL</Link>
-          </li>
-          <li>
-            <Link href="/">OM SIDAN</Link>
-          </li>
-          <li>
-            <Link href="/login" className={styles.authLink}>
-              Logga in
-            </Link>
-            </li>
-            <li>
-            <Link href="/signup" className={styles.authLink}>
-              Skapa konto
-            </Link>
-          </li>
-        </ul>
-      </nav> */}
     </header>
   );
 };

@@ -41,7 +41,6 @@ const QuizActions = ({ questions, themes, difficulties }: QuizActionsProps) => {
   );
 
   const pdfDownloadHref = `api/quiz/pdf?${pdfParams.toString()}`;
-  console.log("PDF download href:", pdfDownloadHref);
 
   const fallbackParams = new URLSearchParams();
   themes.forEach((theme) => fallbackParams.append("themes", theme));

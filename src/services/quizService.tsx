@@ -243,7 +243,9 @@ export const updateQuestion = async (
  * Deletes an existing question created by the authenticated user.
  */
 export const deleteQuestion = async (questionId: number) => {
-  const questionsUrl = getQuestionsUrl();
+  // doesnt work in this function right now
+  // const questionsUrl = getQuestionsUrl();
+  const questionsUrl = process.env.NEXT_PUBLIC_QUESTION_EDIT_URL;
 
   try {
     const res = await fetch(`${questionsUrl}/${questionId.toString()}`, {

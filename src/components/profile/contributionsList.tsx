@@ -209,7 +209,6 @@ const ContributionsList = () => {
     setActionMessage("");
 
     try {
-      console.log("edit form: ", editForm);
       await updateQuestion(questionId, editForm);
       setActionMessage("Frågan har uppdaterats.");
       setEditingQuestionId(null);

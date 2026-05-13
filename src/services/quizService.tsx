@@ -8,7 +8,7 @@ import { getData, postData } from "./serviceBase";
 import { buildUrl } from "./utils/buildUrl";
 import { getErrorMessage, getRequiredHttpsUrl } from "./utils/httpHelpers";
 
-const NEXT_PUBLIC_PDF_URL = process.env.NEXT_PUBLIC_PDF_URL || "";
+const NEXT_PUBLIC_QUESTION_URL = process.env.NEXT_PUBLIC_QUESTION_URL || "";
 const STATUS_MESSAGES: Record<number, string> = {
   400: "Invalid question data",
   401: "You are not authenticated",
@@ -17,15 +17,18 @@ const STATUS_MESSAGES: Record<number, string> = {
 };
 
 const getQuestionsUrl = () => {
-  const explicitQuestionsUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const explicitQuestionsUrl = process.env.NEXT_PUBLIC_QUESTION_URL;
 
   if (explicitQuestionsUrl?.trim()) {
-    return getRequiredHttpsUrl(explicitQuestionsUrl, "NEXT_PUBLIC_BASE_URL");
+    return getRequiredHttpsUrl(
+      explicitQuestionsUrl,
+      "NEXT_PUBLIC_QUESTION_URL",
+    );
   }
 
   const baseUrl = getRequiredHttpsUrl(
-    process.env.NEXT_PUBLIC_BASE_URL,
-    "NEXT_PUBLIC_BASE_URL",
+    process.env.NEXT_PUBLIC_QUESTION_URL,
+    "NEXT_PUBLIC_QUESTION_URL",
   );
 
   return `${baseUrl.replace(/\/$/, "")}/questions`;
@@ -133,13 +136,18 @@ export const getPdf = async (
     .filter((difficulty) => difficulty.length > 0)
     .forEach((difficulty) => queryParams.append("difficulties", difficulty));
 
-  console.log(`PDF URL: ${NEXT_PUBLIC_PDF_URL}?${queryParams.toString()}`);
+  console.log(
+    `PDF URL: ${NEXT_PUBLIC_QUESTION_URL}/pdf?${queryParams.toString()}`,
+  );
 
-  const res = await fetch(`${NEXT_PUBLIC_PDF_URL}?${queryParams.toString()}`, {
-    method: "GET",
-    cache: "no-store",
-    credentials: "include",
-  });
+  const res = await fetch(
+    `${NEXT_PUBLIC_QUESTION_URL}/pdf?${queryParams.toString()}`,
+    {
+      method: "GET",
+      cache: "no-store",
+      credentials: "include",
+    },
+  );
   console.log("PDF response status:", res);
 
   if (!res.ok) {
@@ -151,7 +159,7 @@ export const getPdf = async (
 
 /**
  * Creates a new question for the authenticated user.
- * Uses NEXT_PUBLIC_BASE_URL when available
+ * Uses NEXT_PUBLIC_QUESTION_URL when available
  */
 export const createQuestion = async (
   questionData: PostQuestionRequest,
@@ -204,7 +212,7 @@ export const updateQuestion = async (
 ) => {
   // doesnt work in this function right now
   // const questionsUrl = getQuestionsUrl();
-  const questionsUrl = process.env.NEXT_PUBLIC_QUESTION_EDIT_URL;
+  const questionsUrl = process.env.NEXT_PUBLIC_QUESTION_URL;
 
   try {
     // this is to accomodate backend, should be fixed to look better
@@ -245,7 +253,7 @@ export const updateQuestion = async (
 export const deleteQuestion = async (questionId: number) => {
   // doesnt work in this function right now
   // const questionsUrl = getQuestionsUrl();
-  const questionsUrl = process.env.NEXT_PUBLIC_QUESTION_EDIT_URL;
+  const questionsUrl = process.env.NEXT_PUBLIC_QUESTION_URL;
 
   try {
     const res = await fetch(`${questionsUrl}/${questionId.toString()}`, {

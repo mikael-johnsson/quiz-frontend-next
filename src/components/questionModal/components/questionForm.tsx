@@ -5,7 +5,7 @@ import { getThemeOptions } from "@/components/quizForm/utils/getThemeOptions";
 import { useEffect, useRef, useState } from "react";
 import styles from "./questionForm.module.css";
 
-const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "";
+const NEXT_PUBLIC_QUESTION_URL = process.env.NEXT_PUBLIC_QUESTION_URL || "";
 
 const QUESTION_TYPES = [{ value: "singleAnswer", label: "Vanligt svar" }];
 
@@ -57,7 +57,7 @@ const QuestionForm = ({ onCreated }: QuestionFormProps) => {
       setError(null);
 
       try {
-        const themeOptions = await getThemeOptions(NEXT_PUBLIC_BASE_URL);
+        const themeOptions = await getThemeOptions(NEXT_PUBLIC_QUESTION_URL);
         setThemes(themeOptions);
       } catch {
         setError("Kunde inte hämta teman. Försök igen.");

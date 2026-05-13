@@ -5,7 +5,7 @@ import Quiz from "@/components/quiz/quiz";
 import { normalizeArray } from "@/lib/utils";
 import NotApprovedFeedGate from "@/components/notApprovedFeed/notApprovedFeedGate";
 
-const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "";
+const NEXT_PUBLIC_QUESTION_URL = process.env.NEXT_PUBLIC_QUESTION_URL || "";
 
 type PageProps = {
   searchParams: Promise<{
@@ -34,7 +34,7 @@ export default async function Home({ searchParams }: PageProps) {
           <Quiz
             themes={themes}
             difficulties={difficulties}
-            url={NEXT_PUBLIC_BASE_URL}
+            url={NEXT_PUBLIC_QUESTION_URL}
           />
         )}
       </section>

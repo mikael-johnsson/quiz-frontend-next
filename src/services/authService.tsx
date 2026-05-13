@@ -14,22 +14,28 @@ const STATUS_MESSAGES: Record<number, string> = {
   500: "Server error. Please try again later",
 };
 
+/**
+ *
+ * @returns A url to the changePassword endpoint
+ *  should handle undefined env-var better
+ */
 const getChangePasswordUrl = () => {
-  const explicitChangePasswordUrl = process.env.NEXT_PUBLIC_CHANGE_PASSWORD_URL;
+  try {
+    const explicitChangePasswordUrl =
+      process.env.NEXT_PUBLIC_USERS_URL + "/passwordchange";
 
-  if (explicitChangePasswordUrl?.trim()) {
-    return getRequiredHttpsUrl(
-      explicitChangePasswordUrl,
-      "NEXT_PUBLIC_CHANGE_PASSWORD_URL",
-    );
+    if (explicitChangePasswordUrl?.trim()) {
+      return getRequiredHttpsUrl(
+        explicitChangePasswordUrl,
+        "NEXT_PUBLIC_USERS_URL",
+      );
+    } else {
+      return "default_faulty_url";
+    }
+  } catch (error) {
+    console.error(error);
+    return "default_faulty_url";
   }
-
-  const baseUrl = getRequiredHttpsUrl(
-    process.env.NEXT_PUBLIC_BASE_URL,
-    "NEXT_PUBLIC_BASE_URL",
-  );
-
-  return `${baseUrl.replace(/\/$/, "")}/auth/change-password`;
 };
 
 /**

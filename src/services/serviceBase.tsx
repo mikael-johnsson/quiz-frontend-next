@@ -7,7 +7,7 @@ export const getData = async (
   difficultiesUrl: string,
   isApprovedUrl: string,
 ) => {
-  return fetch(`${url}${themesUrl}${difficultiesUrl}${isApprovedUrl}`, {
+  return fetch(`${url}?${themesUrl}${difficultiesUrl}${isApprovedUrl}`, {
     credentials: "include",
   });
 };
@@ -41,8 +41,8 @@ export const loginUser = async (body: LoginRequest) => {
 };
 
 const signUpURL = getRequiredHttpsUrl(
-  process.env.NEXT_PUBLIC_SIGNUP_URL,
-  "NEXT_PUBLIC_SIGNUP_URL",
+  process.env.NEXT_PUBLIC_USERS_URL,
+  "NEXT_PUBLIC_USERS_URL",
 );
 
 export const signUpUser = async (body: SignUpRequest) => {

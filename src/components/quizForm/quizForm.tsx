@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 
-const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "";
+const NEXT_PUBLIC_QUESTION_URL = process.env.NEXT_PUBLIC_QUESTION_URL || "";
 
 const QuizForm = () => {
   const [themes, setThemes] = useState<string[]>([]);
@@ -30,7 +30,7 @@ const QuizForm = () => {
       setIsLoading(true);
 
       try {
-        const themes = await getThemeOptions(NEXT_PUBLIC_BASE_URL);
+        const themes = await getThemeOptions(NEXT_PUBLIC_QUESTION_URL);
         setThemes(themes);
       } catch (error) {
         console.error(error);

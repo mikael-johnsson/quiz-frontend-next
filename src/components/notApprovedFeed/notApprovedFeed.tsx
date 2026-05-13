@@ -5,7 +5,7 @@ import type { QuestionResponse } from "@/models/types";
 import { getQuestions, updateIsApproved } from "@/services/quizService";
 import styles from "./notApprovedFeed.module.css";
 
-const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "";
+const NEXT_PUBLIC_QUESTION_URL = process.env.NEXT_PUBLIC_QUESTION_URL || "";
 
 const NotApprovedFeed = () => {
   const [data, setData] = useState<QuestionResponse | null>(null);
@@ -14,7 +14,10 @@ const NotApprovedFeed = () => {
   const [isFeedVisible, setIsFeedVisible] = useState(true);
 
   const handleApprove = async (questionId: number, questionText: string) => {
-    const res = await updateIsApproved(questionId, NEXT_PUBLIC_BASE_URL || "");
+    const res = await updateIsApproved(
+      questionId,
+      NEXT_PUBLIC_QUESTION_URL || "",
+    );
     if (!res.ok) {
       setErrorMessage(`Kunde inte godkänna frågan: ${questionText}`);
       return;
@@ -30,7 +33,7 @@ const NotApprovedFeed = () => {
       const response = await getQuestions(
         [],
         [],
-        process.env.NEXT_PUBLIC_BASE_URL || "",
+        process.env.NEXT_PUBLIC_QUESTION_URL || "",
         false,
       );
 

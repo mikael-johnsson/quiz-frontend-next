@@ -18,7 +18,7 @@ type ApprovalFilter = "all" | "approved" | "pending";
 
 type FilterDraft = {
   approval: ApprovalFilter;
-  // search: string;
+  search: string;
   theme: string;
   difficulty: string;
 };
@@ -45,20 +45,18 @@ const ContributionsList = () => {
   const [actionMessage, setActionMessage] = useState("");
   const [filterDraft, setFilterDraft] = useState<FilterDraft>({
     approval: "all",
-    // search: "",
+    search: "",
     theme: "",
     difficulty: "",
   });
   const [activeFilters, setActiveFilters] = useState<FilterDraft>(filterDraft);
 
-  console.log("Active filters: ", activeFilters);
-
   const buildQueryOptions = (filters: FilterDraft) => ({
     ...(filters.approval === "approved" ? { isApproved: true } : {}),
     ...(filters.approval === "pending" ? { isApproved: false } : {}),
-    // ...(filters.search.trim().length > 0
-    //   ? { search: filters.search.trim() }
-    //   : {}),
+    ...(filters.search.trim().length > 0
+      ? { search: filters.search.trim() }
+      : {}),
     ...(filters.theme.trim().length > 0
       ? { themes: [filters.theme.trim()] }
       : {}),
@@ -128,7 +126,7 @@ const ContributionsList = () => {
   const resetFilters = () => {
     const clearedFilters: FilterDraft = {
       approval: "all",
-      // search: "",
+      search: "",
       theme: "",
       difficulty: "",
     };
@@ -320,16 +318,16 @@ const ContributionsList = () => {
           <input
             id="search-filter"
             className={styles.filterInput}
-            disabled={true}
-            // value={filterDraft.search}
-            // onChange={(event) =>
-            //   setFilterDraft({
-            //     ...filterDraft,
-            //     search: event.currentTarget.value,
-            //   })
-            // }
-            // placeholder="Sök i fråga eller svar"
-            placeholder="Disabled for now"
+            disabled={false}
+            value={filterDraft.search}
+            onChange={(event) =>
+              setFilterDraft({
+                ...filterDraft,
+                search: event.currentTarget.value,
+              })
+            }
+            placeholder="Sök i fråga eller svar"
+            // placeholder="Disabled for now"
           />
         </div>
 

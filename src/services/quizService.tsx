@@ -50,7 +50,6 @@ export const getQuestions = async (
     URL,
     themesUrl,
     difficultiesUrl,
-    // `${isApprovedUrl}${amountUrl}`,
     isApprovedUrl,
     amountUrl,
   );
@@ -88,16 +87,14 @@ export const getUserQuestions = async (
     .filter((difficulty) => difficulty.length > 0)
     .forEach((difficulty) => queryParams.append("difficulties", difficulty));
 
-  // comment back when search is implemented in backend
-  // if (options.search?.trim()) {
-  //   queryParams.set("search", options.search.trim());
-  // }
+  if (options.search?.trim()) {
+    queryParams.set("search", options.search.trim());
+  }
 
+  // This should be refactored to be able to use getData() or even the whole
+  // function to be getQuestions instead
   const questionsUrl = getQuestionsUrl();
-  console.log(
-    "URL to fetch questions: ",
-    `${questionsUrl}?${queryParams.toString()}`,
-  );
+
   const res = await fetch(`${questionsUrl}?${queryParams.toString()}`, {
     method: "GET",
     credentials: "include",

@@ -5,7 +5,7 @@ import {
   UserQuestionQueryOptions,
 } from "../models/types";
 import { getData, postData } from "./serviceBase";
-import { buildUrl } from "./utils/buildUrl";
+import { buildUrl } from "./utils/httpHelpers";
 import { getErrorMessage, getRequiredHttpsUrl } from "./utils/httpHelpers";
 
 const NEXT_PUBLIC_QUESTION_URL = process.env.NEXT_PUBLIC_QUESTION_URL || "";

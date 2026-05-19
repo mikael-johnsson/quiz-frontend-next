@@ -49,3 +49,18 @@ export const getErrorMessage = async (
 
   return mappedStatusMessage ?? fallbackMessage;
 };
+
+/**
+ *
+ * @param array list of strings from ex themes to filter on
+ * @param type string ex themes
+ * @returns a part of a url to add to fetch
+ */
+export const buildUrl = (array: string[], type: string) => {
+  let url: string = "";
+  array.forEach((el) => {
+    url = url + type + el;
+  });
+
+  return url;
+};

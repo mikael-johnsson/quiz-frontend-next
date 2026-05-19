@@ -65,10 +65,6 @@ export const getUserQuestions = async (
 
   queryParams.set("createdBy", userId);
 
-  if (typeof options.page === "number" && options.page > 0) {
-    queryParams.set("page", options.page.toString());
-  }
-
   if (typeof options.isApproved === "boolean") {
     queryParams.set("isApproved", options.isApproved.toString());
   }
@@ -83,11 +79,16 @@ export const getUserQuestions = async (
     .filter((difficulty) => difficulty.length > 0)
     .forEach((difficulty) => queryParams.append("difficulties", difficulty));
 
-  if (options.search?.trim()) {
-    queryParams.set("search", options.search.trim());
-  }
+  // comment back when search is implemented in backend
+  // if (options.search?.trim()) {
+  //   queryParams.set("search", options.search.trim());
+  // }
 
   const questionsUrl = getQuestionsUrl();
+  console.log(
+    "URL to fetch questions: ",
+    `${questionsUrl}?${queryParams.toString()}`,
+  );
   const res = await fetch(`${questionsUrl}?${queryParams.toString()}`, {
     method: "GET",
     credentials: "include",

@@ -63,7 +63,6 @@ export type PasswordChangeRequest = {
  * the service layer, and the backend endpoint.
  */
 export type UserQuestionQueryOptions = {
-  page?: number;
   isApproved?: boolean;
   themes?: string[];
   difficulties?: string[];

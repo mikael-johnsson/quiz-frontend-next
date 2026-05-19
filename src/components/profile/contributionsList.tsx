@@ -18,7 +18,7 @@ type ApprovalFilter = "all" | "approved" | "pending";
 
 type FilterDraft = {
   approval: ApprovalFilter;
-  search: string;
+  // search: string;
   theme: string;
   difficulty: string;
 };
@@ -45,18 +45,20 @@ const ContributionsList = () => {
   const [actionMessage, setActionMessage] = useState("");
   const [filterDraft, setFilterDraft] = useState<FilterDraft>({
     approval: "all",
-    search: "",
+    // search: "",
     theme: "",
     difficulty: "",
   });
   const [activeFilters, setActiveFilters] = useState<FilterDraft>(filterDraft);
 
+  console.log("Active filters: ", activeFilters);
+
   const buildQueryOptions = (filters: FilterDraft) => ({
     ...(filters.approval === "approved" ? { isApproved: true } : {}),
     ...(filters.approval === "pending" ? { isApproved: false } : {}),
-    ...(filters.search.trim().length > 0
-      ? { search: filters.search.trim() }
-      : {}),
+    // ...(filters.search.trim().length > 0
+    //   ? { search: filters.search.trim() }
+    //   : {}),
     ...(filters.theme.trim().length > 0
       ? { themes: [filters.theme.trim()] }
       : {}),
@@ -126,7 +128,7 @@ const ContributionsList = () => {
   const resetFilters = () => {
     const clearedFilters: FilterDraft = {
       approval: "all",
-      search: "",
+      // search: "",
       theme: "",
       difficulty: "",
     };
@@ -279,6 +281,7 @@ const ContributionsList = () => {
         </article>
       </section>
 
+      {/* ---- FILTERS ---- */}
       <form className={styles.filters} onSubmit={submitFilters}>
         <div className={styles.filterRow}>
           <label className={styles.filterLabel} htmlFor="approval-filter">
@@ -289,10 +292,10 @@ const ContributionsList = () => {
             className={styles.filterInput}
             value={filterDraft.approval}
             onChange={(event) =>
-              setFilterDraft((current) => ({
-                ...current,
+              setFilterDraft({
+                ...filterDraft,
                 approval: event.currentTarget.value as ApprovalFilter,
-              }))
+              })
             }
           >
             <option value="all">Alla</option>
@@ -308,14 +311,16 @@ const ContributionsList = () => {
           <input
             id="search-filter"
             className={styles.filterInput}
-            value={filterDraft.search}
-            onChange={(event) =>
-              setFilterDraft((current) => ({
-                ...current,
-                search: event.currentTarget.value,
-              }))
-            }
-            placeholder="Sök i fråga eller svar"
+            disabled={true}
+            // value={filterDraft.search}
+            // onChange={(event) =>
+            //   setFilterDraft({
+            //     ...filterDraft,
+            //     search: event.currentTarget.value,
+            //   })
+            // }
+            // placeholder="Sök i fråga eller svar"
+            placeholder="Disabled for now"
           />
         </div>
 
@@ -328,10 +333,10 @@ const ContributionsList = () => {
             className={styles.filterInput}
             value={filterDraft.theme}
             onChange={(event) =>
-              setFilterDraft((current) => ({
-                ...current,
+              setFilterDraft({
+                ...filterDraft,
                 theme: event.currentTarget.value,
-              }))
+              })
             }
             placeholder="Filtrera på tema"
           />
@@ -346,12 +351,12 @@ const ContributionsList = () => {
             className={styles.filterInput}
             value={filterDraft.difficulty}
             onChange={(event) =>
-              setFilterDraft((current) => ({
-                ...current,
+              setFilterDraft({
+                ...filterDraft,
                 difficulty: event.currentTarget.value,
-              }))
+              })
             }
-            placeholder="Filtrera på svårighetsgrad"
+            placeholder="Filtrera svårighetsgrad (svår, enkelt, medium)"
           />
         </div>
 
@@ -375,10 +380,12 @@ const ContributionsList = () => {
         </p>
       )}
 
+      {/* ---- QUESTIONS ---- */}
+
       {questions.map((question) => (
         <article key={question.id} className={styles.card}>
           <div className={styles.cardHeader}>
-            <h3 className={styles.questionTitle}>{question.question}</h3>
+            <h3 className={styles.questionTitle}>Fråga: {question.question}</h3>
             <span
               className={`${styles.badge} ${
                 question.isApproved ? styles.approved : styles.pending
@@ -387,6 +394,8 @@ const ContributionsList = () => {
               {question.isApproved ? "Godkänd" : "Väntar på godkännande"}
             </span>
           </div>
+
+          <div className={styles.questionTitle}>Svar: {question.answer}</div>
 
           <dl className={styles.metaList}>
             <div className={styles.metaRow}>

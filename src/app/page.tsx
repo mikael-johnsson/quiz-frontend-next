@@ -12,6 +12,7 @@ type PageProps = {
     themes?: string | string[];
     difficulties?: string | string[];
     generate: string;
+    amount?: string | string[];
   }>;
 };
 
@@ -23,6 +24,16 @@ export default async function Home({ searchParams }: PageProps) {
 
   const hasGenerated = params.generate === "true";
 
+  // Parse `amount` from searchParams. Backend default is 20 when omitted.
+  const rawAmount = Array.isArray(params.amount) ? params.amount[0] : params.amount;
+  let amount = 20; // backend default
+  if (rawAmount !== undefined) {
+    const parsed = parseInt(rawAmount, 10);
+    if (!Number.isNaN(parsed)) {
+      amount = Math.min(Math.max(parsed, 1), 50);
+    }
+  }
+
   return (
     <main className={styles.main}>
       <LandingAside />
@@ -32,10 +43,11 @@ export default async function Home({ searchParams }: PageProps) {
         <QuizForm />
         {hasGenerated && (
           <Quiz
-            themes={themes}
-            difficulties={difficulties}
-            url={NEXT_PUBLIC_QUESTION_URL}
-          />
+              themes={themes}
+              difficulties={difficulties}
+              url={NEXT_PUBLIC_QUESTION_URL}
+              amount={amount}
+            />
         )}
       </section>
     </main>

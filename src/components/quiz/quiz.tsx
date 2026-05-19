@@ -6,14 +6,16 @@ type QuizProps = {
   themes: string[];
   difficulties: string[];
   url: string;
+  amount?: number;
 };
 
 const Quiz = async ({
   themes = [],
   difficulties = [],
   url = "",
+  amount,
 }: QuizProps) => {
-  const data = await getQuestions(themes, difficulties, url);
+  const data = await getQuestions(themes, difficulties, url, amount);
   const questions = data.questions;
   return (
     <>

@@ -151,9 +151,18 @@ const ContributionsList = () => {
 
   if (errorMessage) {
     return (
-      <p className={styles.statusError} role="alert">
-        {errorMessage}
-      </p>
+      <>
+        <p className={styles.statusError} role="alert">
+          Error message: {errorMessage}
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            onClick={resetFilters}
+          >
+            Rensa filter
+          </button>
+        </p>
+      </>
     );
   }
 

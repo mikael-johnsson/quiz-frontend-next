@@ -15,7 +15,7 @@ const Quiz = async ({
   url = "",
   amount,
 }: QuizProps) => {
-  const data = await getQuestions(themes, difficulties, url, amount);
+  const data = await getQuestions(themes, difficulties, url, true, amount);
   const questions = data.questions;
   return (
     <>

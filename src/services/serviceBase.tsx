@@ -6,10 +6,18 @@ export const getData = async (
   themesUrl: string,
   difficultiesUrl: string,
   isApprovedUrl: string,
+  amountUrl: string,
 ) => {
-  return fetch(`${url}?${themesUrl}${difficultiesUrl}${isApprovedUrl}`, {
-    credentials: "include",
-  });
+  console.log(
+    "URL FOR FETCH: ",
+    `${url}?${themesUrl}${difficultiesUrl}${isApprovedUrl}${amountUrl}`,
+  );
+  return await fetch(
+    `${url}?${themesUrl}${difficultiesUrl}${isApprovedUrl}${amountUrl}`,
+    {
+      credentials: "include",
+    },
+  );
 };
 
 /**

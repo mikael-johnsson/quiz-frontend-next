@@ -71,7 +71,7 @@ const QuizActions = ({ questions, themes, difficulties }: QuizActionsProps) => {
 
   return (
     <div
-      className={styles.actionsContainer}
+      className={`${styles.actionsContainer} QuizActionsContainer`}
       data-question-count={questions.length}
     >
       <Link
@@ -81,13 +81,13 @@ const QuizActions = ({ questions, themes, difficulties }: QuizActionsProps) => {
       >
         Rensa quiz
       </Link>
-      <a
+      <Link
         href={pdfDownloadHref}
         className={styles.downloadButton}
         onClick={handleDownloadClick}
       >
         Ladda ner PDF
-      </a>
+      </Link>
       {fallbackWarning && (
         <p className={styles.snapshotWarning}>{fallbackWarning}</p>
       )}

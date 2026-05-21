@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import styles from "./header.module.css";
-import MenuButton from "./components/menuButton";
+import MenuButton from "./components/menuButton/menuButton";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import QuestionModal from "../questionModal/questionModal";
+import QuestionModal from "./components/questionModal/questionModal";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

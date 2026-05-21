@@ -1,9 +1,9 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import PasswordChangeForm from "@/components/profileSettings/passwordChangeForm";
+import PasswordChangeForm from "@/app/profile/[id]/components/profileSettings/passwordChangeForm";
 import styles from "./page.module.css";
-import ContributionsList from "@/components/profile/contributionsList";
+import ContributionsList from "@/app/profile/[id]/components/profile/contributionsList";
 
 /**
  * ProfilePage - Displays the authenticated user's personal profile dashboard.

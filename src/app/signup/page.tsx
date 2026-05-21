@@ -1,4 +1,4 @@
-import SignUpForm from "@/components/signUpForm/signUpForm";
+import SignUpForm from "@/app/signup/components/signUpForm/signUpForm";
 import Link from "next/link";
 import styles from "../login/page.module.css";
 

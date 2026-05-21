@@ -19,9 +19,6 @@ const Quiz = async ({
   const questions = data.questions;
   return (
     <>
-      {/* Navigating to /?generate=false causes Home to set hasGenerated=false,
-          which unmounts this entire Quiz component and clears both
-          the message container and the questions list */}
       <QuizActions
         questions={questions}
         themes={themes}

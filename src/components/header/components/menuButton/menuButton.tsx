@@ -1,6 +1,7 @@
 import styles from "./menuButton.module.css";
 import Image from "next/image";
-import icon from "../../../../public/bars-solid-full.svg";
+import icon from "../../../../../public/bars-solid-full.svg";
+
 type MenuToggleButtonProps = {
   isOpen: boolean;
   controlsId: string;

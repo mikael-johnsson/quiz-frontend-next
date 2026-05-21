@@ -74,7 +74,7 @@ export const getQuestions = async (
  * The backend is expected to always return exactly three quizzes.
  */
 export const getQuizPreviews = async () => {
-  const res = await fetch(`${getQuizBaseUrl()}/quiz`, {
+  const res = await fetch(`${getQuizBaseUrl()}/quiz?populate=true`, {
     method: "GET",
     cache: "no-store",
     credentials: "include",

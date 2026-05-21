@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { SavedQuiz } from "@/models/types";
+import type { Question, SavedQuiz } from "@/models/types";
 import {
   getSavedQuiz,
   saveQuizById,
@@ -16,14 +16,20 @@ type QuizPreviewCardProps = {
 
 export const QuizPreviewCard = ({ quiz }: QuizPreviewCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [loadedQuiz, setLoadedQuiz] = useState<SavedQuiz | null>(null);
+  const [quizMeta, setQuizMeta] = useState<
+    Partial<Pick<SavedQuiz, "amountOfSaves" | "createdBy" | "createdWhen">>
+  >({});
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const activeQuiz = loadedQuiz ?? quiz;
+  const activeQuiz = {
+    ...quiz,
+    ...quizMeta,
+  };
 
   const { user, setUser } = useAuth();
-  const isSaved = Boolean(user?.savedQuizzes?.includes(quiz._id));
+  const savedQuizIds = (user?.savedQuizzes ?? []).map(String);
+  const isSaved = savedQuizIds.includes(String(quiz._id));
 
   const toggleQuiz = async () => {
     if (isExpanded) {
@@ -33,22 +39,6 @@ export const QuizPreviewCard = ({ quiz }: QuizPreviewCardProps) => {
     }
 
     setIsExpanded(true);
-
-    if (loadedQuiz) {
-      return;
-    }
-
-    setIsLoadingQuiz(true);
-    setErrorMessage("");
-
-    try {
-      const quizDetails = await getSavedQuiz(quiz._id);
-      setLoadedQuiz(quizDetails);
-    } catch {
-      setErrorMessage("Kunde inte ladda quizet just nu.");
-    } finally {
-      setIsLoadingQuiz(false);
-    }
   };
 
   const handleSave = async () => {
@@ -76,10 +66,13 @@ export const QuizPreviewCard = ({ quiz }: QuizPreviewCardProps) => {
         setUser({ ...user, savedQuizzes: updated });
         try {
           const latest = await getSavedQuiz(quiz._id);
-          setLoadedQuiz(latest);
-        } catch {
-          // ignore fetch error; UI already updated optimistically
-        }
+          setQuizMeta((current) => ({
+            ...current,
+            amountOfSaves: latest.amountOfSaves,
+            createdBy: latest.createdBy,
+            createdWhen: latest.createdWhen,
+          }));
+        } catch {}
       } else {
         await saveQuizById(quiz._id);
         const updated = Array.from(
@@ -88,10 +81,13 @@ export const QuizPreviewCard = ({ quiz }: QuizPreviewCardProps) => {
         setUser({ ...user, savedQuizzes: updated });
         try {
           const latest = await getSavedQuiz(quiz._id);
-          setLoadedQuiz(latest);
-        } catch {
-          // ignore fetch error; UI already updated optimistically
-        }
+          setQuizMeta((current) => ({
+            ...current,
+            amountOfSaves: latest.amountOfSaves,
+            createdBy: latest.createdBy,
+            createdWhen: latest.createdWhen,
+          }));
+        } catch {}
       }
     } catch (err) {
       setErrorMessage(
@@ -136,13 +132,17 @@ export const QuizPreviewCard = ({ quiz }: QuizPreviewCardProps) => {
           {!isLoadingQuiz && !errorMessage && (
             <div>
               <h3 className={styles.expandedHeading}>Frågor i quizet</h3>
-              {activeQuiz.questions.length > 0 ? (
+              {quiz.questions.length > 0 ? (
                 <ol className={styles.questionList}>
-                  {activeQuiz.questions.map((questionId) => (
-                    <li key={questionId} className={styles.questionItem}>
-                      Fråga med id {questionId}
-                    </li>
-                  ))}
+                  {(quiz.questions as (number | Question)[]).map((q) => {
+                    const isNumber = typeof q === "number";
+                    const key = isNumber ? q : (q.id ?? JSON.stringify(q));
+                    return (
+                      <li key={key} className={styles.questionItem}>
+                        {isNumber ? `Fråga med id ${q}` : q.question}
+                      </li>
+                    );
+                  })}
                 </ol>
               ) : (
                 <p className={styles.status}>Inga frågor finns i detta quiz.</p>

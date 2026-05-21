@@ -5,6 +5,7 @@ import Quiz from "@/components/quiz/quiz";
 import { normalizeArray } from "@/lib/utils";
 import NotApprovedFeedGate from "@/components/notApprovedFeed/notApprovedFeedGate";
 import { getThemeOptions } from "@/components/quizForm/utils/getThemeOptions";
+import DevelopmentBanner from "@/components/developmentBanner/developmentBanner";
 
 const NEXT_PUBLIC_QUESTION_URL = process.env.NEXT_PUBLIC_QUESTION_URL || "";
 
@@ -41,6 +42,7 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
     <main className={styles.main}>
+      <DevelopmentBanner />
       <LandingAside />
       <NotApprovedFeedGate />
       <section className={styles.section}>

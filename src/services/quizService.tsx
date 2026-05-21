@@ -1,6 +1,7 @@
 import {
   PostQuestionRequest,
   QuestionResponse,
+  SavedQuiz,
   UpdateQuestionRequest,
   UserQuestionQueryOptions,
 } from "../models/types";
@@ -34,6 +35,13 @@ const getQuestionsUrl = () => {
   return `${baseUrl.replace(/\/$/, "")}/questions`;
 };
 
+const getQuizBaseUrl = () => {
+  return getRequiredHttpsUrl(
+    process.env.NEXT_PUBLIC_BASE_URL,
+    "NEXT_PUBLIC_QUESTION_URL",
+  ).replace(/\/$/, "");
+};
+
 export const getQuestions = async (
   themes: string[],
   difficulties: string[],
@@ -59,6 +67,119 @@ export const getQuestions = async (
   }
   const data: QuestionResponse = await res.json();
   return data;
+};
+
+/**
+ * Loads the quiz previews that appear on the landing page.
+ * The backend is expected to always return exactly three quizzes.
+ */
+export const getQuizPreviews = async () => {
+  const res = await fetch(`${getQuizBaseUrl()}/quiz`, {
+    method: "GET",
+    cache: "no-store",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to load quiz previews");
+  }
+
+  // const data: SavedQuizListResponse = await res.json();
+  const data: SavedQuiz[] = await res.json();
+
+  return data;
+};
+
+/**
+ * Loads one saved quiz in full so the landing page can expand it on demand.
+ */
+export const getSavedQuiz = async (quizId: string) => {
+  const encodedQuizId = encodeURIComponent(quizId);
+  console.log(
+    "getSavedQuiz fetch: ",
+    `${getQuizBaseUrl()}/quiz/${encodedQuizId}`,
+  );
+  const res = await fetch(`${getQuizBaseUrl()}/quiz/${encodedQuizId}`, {
+    method: "GET",
+    cache: "no-store",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to load quiz details");
+  }
+
+  const data: SavedQuiz = await res.json();
+  return data;
+};
+
+/**
+ * Saves the currently generated quiz on the backend.
+ * According to the contract the request has no body and relies on cookie auth.
+ */
+export const saveGeneratedQuiz = async () => {
+  const res = await fetch(`${getQuizBaseUrl()}/quiz`, {
+    method: "PATCH",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error(
+      await getErrorMessage(res, "Failed to save quiz", STATUS_MESSAGES),
+    );
+  }
+
+  return res;
+};
+
+/**
+ * Save a specific quiz for the authenticated user.
+ * POST /quiz/:id/save
+ */
+export const saveQuizById = async (quizId: string) => {
+  if (!quizId) {
+    throw new Error("quizId is required to save a quiz");
+  }
+  const res = await fetch(
+    `${getQuizBaseUrl()}/quiz/${encodeURIComponent(quizId)}/save`,
+    {
+      method: "PATCH",
+      credentials: "include",
+    },
+  );
+
+  if (!res.ok) {
+    throw new Error(
+      await getErrorMessage(res, "Failed to save quiz", STATUS_MESSAGES),
+    );
+  }
+
+  return res;
+};
+
+/**
+ * Unsave a specific quiz for the authenticated user.
+ * POST /quiz/:id/unsave
+ */
+export const unsaveQuizById = async (quizId: string) => {
+  if (!quizId) {
+    throw new Error("quizId is required to unsave a quiz");
+  }
+  const res = await fetch(
+    `${getQuizBaseUrl()}/quiz/${encodeURIComponent(quizId)}/unsave`,
+    {
+      method: "PATCH",
+      credentials: "include",
+    },
+  );
+
+  if (!res.ok) {
+    throw new Error(
+      await getErrorMessage(res, "Failed to unsave quiz", STATUS_MESSAGES),
+    );
+  }
+
+  return res;
 };
 
 /**

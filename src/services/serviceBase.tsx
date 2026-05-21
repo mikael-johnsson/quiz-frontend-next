@@ -8,10 +8,6 @@ export const getData = async (
   isApprovedUrl: string,
   amountUrl: string,
 ) => {
-  console.log(
-    "URL FOR FETCH: ",
-    `${url}?${themesUrl}${difficultiesUrl}${isApprovedUrl}${amountUrl}`,
-  );
   return await fetch(
     `${url}?${themesUrl}${difficultiesUrl}${isApprovedUrl}${amountUrl}`,
     {

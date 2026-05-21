@@ -37,7 +37,6 @@ const NotApprovedFeed = () => {
         false,
         3,
       );
-      console.log("response in notApprovedFeed: ", response);
 
       setData(response);
     } catch {

@@ -16,6 +16,18 @@ export type Question = {
 };
 
 /**
+ * Quiz data returned from the backend for the landing page and saved quiz flow.
+ * This keeps the quiz identifier separate from the question IDs stored inside it.
+ */
+export type SavedQuiz = {
+  _id: string;
+  questions: number[];
+  createdBy: string;
+  amountOfSaves: number;
+  createdWhen?: string;
+};
+
+/**
  * Stores the exact quiz selection rendered in the UI,
  * so later actions (like PDF download) can reference the same question IDs.
  */
@@ -48,6 +60,7 @@ export type AuthResponse = {
   id: string;
   email: string;
   firstname: string;
+  savedQuizzes?: string[];
 };
 
 /** Data sent to the server when a user changes their password */

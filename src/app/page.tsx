@@ -2,6 +2,7 @@ import LandingAside from "@/components/landingAside/landingAside";
 import styles from "./page.module.css";
 import QuizForm from "@/components/quizForm/quizForm";
 import Quiz from "@/components/quiz/quiz";
+import QuizList from "@/components/quizList/quizList";
 import { normalizeArray } from "@/lib/utils";
 import NotApprovedFeedGate from "@/components/notApprovedFeed/notApprovedFeedGate";
 import { getThemeOptions } from "@/components/quizForm/utils/getThemeOptions";
@@ -48,6 +49,7 @@ export default async function Home({ searchParams }: PageProps) {
       <section className={styles.section}>
         <h1 className={styles.h1}>Skapa ditt quiz direkt!</h1>
         <QuizForm themes={themes} />
+        <QuizList />
         {hasGenerated && (
           <Quiz
             themes={urlThemes}

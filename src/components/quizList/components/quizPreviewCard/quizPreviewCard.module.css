@@ -1,0 +1,94 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.9rem 1rem;
+  border-radius: 10px;
+  background-color: var(--prim-text-color);
+  color: var(--prim-bg-color);
+}
+
+.creatorButton {
+  width: fit-content;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.creatorButton:hover {
+  text-decoration: underline;
+}
+
+.creatorButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.saves {
+  font-size: 0.95rem;
+}
+
+.expandedContent {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid
+    color-mix(in srgb, var(--prim-bg-color) 18%, transparent);
+}
+
+.expandedHeading {
+  margin-bottom: 0.4rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.questionList {
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.questionItem {
+  overflow-wrap: anywhere;
+}
+
+.status {
+  font-size: 0.95rem;
+}
+
+.error {
+  font-size: 0.95rem;
+  color: #8b0000;
+}
+
+.saveButton {
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 6px;
+  border: 0;
+  background-color: var(--accent);
+  color: var(--prim-bg-color);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.saveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.savedBadge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 6px;
+  background: #2e7d32;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+}

@@ -138,12 +138,9 @@ export const getMe = async (): Promise<AuthResponse> => {
       );
     }
 
-    const payload = (await res.json()) as {
-      message?: string;
-      payload?: { id: string; firstname: string; email: string };
-    };
+    const payload = await res.json();
 
-    const user = payload.payload;
+    const user = payload?.payload;
 
     if (!user) {
       throw new Error("Failed to parse current user response");
@@ -153,6 +150,9 @@ export const getMe = async (): Promise<AuthResponse> => {
       id: user.id,
       firstname: user.firstname,
       email: user.email,
+      savedQuizzes: Array.isArray(user.savedQuizzes)
+        ? user.savedQuizzes.map(String)
+        : [],
     };
   } catch (error) {
     if (error instanceof Error) {

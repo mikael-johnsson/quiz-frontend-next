@@ -139,3 +139,47 @@ Suggested reviewers
 - A frontend reviewer familiar with the landing page layout and the existing server-component data flow.
 
 Effort estimate: medium — about 3–5 hours, depending on whether the backend already exposes a quiz detail endpoint.
+
+---
+
+## Sync saved quizzes after save/unsave
+
+Short description
+
+- Ensure the frontend's `user.savedQuizzes` state stays in sync with backend saved/unsaved actions so UI elements (badges, save button text) reflect the true server state immediately after the user acts.
+
+Problem
+
+- Currently the auth payload cached in the cookie (or backend session) can be stale after a save/unsave operation, causing the UI to show incorrect saved state until the session is refreshed.
+
+Options
+
+- Option A — Client-side refresh (recommended short-term):
+  - After a successful `save` or `unsave` request, call the existing `refreshMe()` from the `AuthContext` to re-fetch the current user and update `user.savedQuizzes`.
+  - Pros: No backend work required; simple to implement; ensures the client mirrors server state.
+  - Cons: One additional network request on each save/unsave action.
+
+- Option B — Server-side immediate cookie/payload update (recommended long-term):
+  - Ensure the backend updates the auth cookie/session payload when the user saves or unsaves a quiz, so subsequent `GET /me` calls (or server-rendered pages) immediately reflect the new saved state.
+  - Pros: Single source of truth on server; no extra client requests; consistent for server-side rendering.
+  - Cons: Requires backend changes and careful handling of cookie payload size and security.
+
+Proposed implementation (practical path)
+
+1. Implement Option A first (client-side `refreshMe()`):
+   - Call `await refreshMe()` after `setUser(...)` in save/unsave handlers so the client immediately re-syncs with the server.
+   - Add minimal loading indicator or optimistic UI for `amountOfSaves` to keep UX smooth while `refreshMe()` runs.
+2. Parallel or later: request backend change to update auth cookie/payload on save/unsave (Option B) to remove the extra round-trip.
+
+Files to change
+
+- `src/components/quizList/components/quizPreviewCard/quizPreviewCard.tsx` — call `refreshMe()` after `setUser` in `handleSave()`.
+- `src/contexts/AuthContext.tsx` — verify `refreshMe()` is exported and performs a fresh `getMe()` call (no change expected if already implemented).
+- Optional: small UI tweak in `quizPreviewCard` to optimistically update `amountOfSaves` while `refreshMe()` is pending.
+
+Acceptance criteria
+
+- After saving or unsaving a quiz, the UI immediately shows the correct `SAVED` badge and button text for that quiz.
+- `GET /me` remains the canonical source of truth; `refreshMe()` updates local `user` accordingly.
+
+Effort estimate: small — ~30–60 minutes to implement client-side refresh and basic optimistic UI.

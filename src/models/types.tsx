@@ -22,7 +22,7 @@ export type Question = {
 export type SavedQuiz = {
   _id: string;
   questions: number[] | Question[];
-  createdBy: string;
+  createdBy: { id: string; firstname: string };
   amountOfSaves: number;
   createdWhen?: string;
 };

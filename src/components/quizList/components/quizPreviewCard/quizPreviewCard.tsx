@@ -105,7 +105,7 @@ export const QuizPreviewCard = ({ quiz }: QuizPreviewCardProps) => {
         className={styles.creatorButton}
         onClick={toggleQuiz}
       >
-        Quiz skapat av: {activeQuiz.createdBy}
+        Quiz skapat av: {activeQuiz.createdBy.firstname}
       </button>
       <div className={styles.saves}>
         Antal sparningar: {activeQuiz.amountOfSaves}

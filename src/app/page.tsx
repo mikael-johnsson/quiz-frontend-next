@@ -43,13 +43,15 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
     <main className={styles.main}>
-      <DevelopmentBanner />
-      <LandingAside />
-      <NotApprovedFeedGate />
-      <section className={styles.section}>
+      <div>
+        <DevelopmentBanner />
+        <LandingAside />
+        <NotApprovedFeedGate />
+      </div>
+
+      <div className={styles.section}>
         <h1 className={styles.h1}>Skapa ditt quiz direkt!</h1>
         <QuizForm themes={themes} />
-        <QuizList />
         {hasGenerated && (
           <Quiz
             themes={urlThemes}
@@ -58,7 +60,8 @@ export default async function Home({ searchParams }: PageProps) {
             amount={amount}
           />
         )}
-      </section>
+        <QuizList />
+      </div>
     </main>
   );
 }

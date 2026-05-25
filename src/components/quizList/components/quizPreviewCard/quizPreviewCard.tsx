@@ -9,6 +9,7 @@ import {
 } from "@/services/quizService";
 import { useAuth } from "@/contexts/AuthContext";
 import styles from "./quizPreviewCard.module.css";
+import { HeartIcon } from "@heroicons/react/24/solid";
 
 type QuizPreviewCardProps = {
   quiz: SavedQuiz;
@@ -113,14 +114,18 @@ export const QuizPreviewCard = ({ quiz }: QuizPreviewCardProps) => {
       <div>
         {user ? (
           <>
-            {isSaved && <span className={styles.savedBadge}>SAVED</span>}
             <button
               type="button"
-              className={styles.saveButton}
               onClick={handleSave}
+              className={styles.saveButton}
+              aria-label={isSaved ? "Ta bort sparat quiz" : "Spara quiz"}
+              aria-pressed={isSaved}
               disabled={isLoadingQuiz}
             >
-              {isSaved ? "UNSAVE" : "SAVE"}
+              <HeartIcon
+                className={styles.saveIcon}
+                color={isSaved ? "red" : "currentColor"}
+              />
             </button>
           </>
         ) : null}

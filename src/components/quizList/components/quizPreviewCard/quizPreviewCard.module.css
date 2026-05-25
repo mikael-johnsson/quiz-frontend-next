@@ -67,19 +67,40 @@
 }
 
 .saveButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   margin-top: 0.5rem;
-  padding: 0.45rem 0.75rem;
-  border-radius: 6px;
+  padding: 0.45rem;
+  border-radius: 999px;
   border: 0;
   background-color: var(--accent);
   color: var(--prim-bg-color);
-  font-weight: 700;
+  line-height: 0;
   cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .saveButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.saveButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.saveButton:focus-visible {
+  outline: 2px solid var(--prim-bg-color);
+  outline-offset: 3px;
+}
+
+.saveIcon {
+  width: 1.1rem;
+  height: 1.1rem;
 }
 
 .savedBadge {

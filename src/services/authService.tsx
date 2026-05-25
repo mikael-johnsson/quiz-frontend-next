@@ -139,8 +139,6 @@ export const getMe = async (): Promise<AuthResponse> => {
     }
 
     const payload = await res.json();
-    console.log("GET /me raw:", payload);
-
     const user = payload?.payload;
 
     if (!user) {

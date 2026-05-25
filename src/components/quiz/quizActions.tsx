@@ -2,7 +2,10 @@
 
 import { useEffect, useState, type MouseEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { Question } from "@/models/types";
+import { useAuth } from "@/contexts/AuthContext";
+import { saveGeneratedQuiz } from "@/services/quizService";
 import {
   clearQuizSnapshot,
   isSnapshotFresh,
@@ -19,6 +22,14 @@ type QuizActionsProps = {
 
 const QuizActions = ({ questions, themes, difficulties }: QuizActionsProps) => {
   const [fallbackWarning, setFallbackWarning] = useState("");
+  const [saveMessage, setSaveMessage] = useState("");
+  const [saveError, setSaveError] = useState("");
+  const [isSavingQuiz, setIsSavingQuiz] = useState(false);
+  const { user, setUser } = useAuth();
+
+  const router = useRouter();
+
+  const generatedQuestionIds = questions.map((question) => String(question.id));
 
   useEffect(() => {
     saveQuizSnapshot({
@@ -69,6 +80,39 @@ const QuizActions = ({ questions, themes, difficulties }: QuizActionsProps) => {
     window.location.href = fallbackPdfDownloadHref;
   };
 
+  const handleSaveQuiz = async () => {
+    if (!user) {
+      setSaveError("");
+      setSaveMessage("Logga in för att spara quizet.");
+      return;
+    }
+
+    setSaveMessage("");
+    setSaveError("");
+    setIsSavingQuiz(true);
+
+    try {
+      const result = await saveGeneratedQuiz({
+        questions: generatedQuestionIds,
+        createdBy: user.id,
+      });
+
+      setUser(result.user);
+      // Refresh the current route so server components (like QuizList) refetch data
+      try {
+        router.refresh();
+      } catch {}
+      setSaveMessage(result.message || "Quizet sparades.");
+    } catch (error) {
+      setSaveMessage("");
+      setSaveError(
+        error instanceof Error ? error.message : "Kunde inte spara quizet.",
+      );
+    } finally {
+      setIsSavingQuiz(false);
+    }
+  };
+
   return (
     <div
       className={`${styles.actionsContainer} QuizActionsContainer`}
@@ -88,9 +132,19 @@ const QuizActions = ({ questions, themes, difficulties }: QuizActionsProps) => {
       >
         Ladda ner PDF
       </Link>
+      <button
+        type="button"
+        className={styles.saveButton}
+        onClick={handleSaveQuiz}
+        disabled={isSavingQuiz}
+      >
+        {isSavingQuiz ? "Sparar quiz..." : "Spara quiz"}
+      </button>
       {fallbackWarning && (
         <p className={styles.snapshotWarning}>{fallbackWarning}</p>
       )}
+      {saveMessage && <p className={styles.snapshotWarning}>{saveMessage}</p>}
+      {saveError && <p className={styles.saveError}>{saveError}</p>}
     </div>
   );
 };

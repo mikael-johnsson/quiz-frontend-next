@@ -28,6 +28,24 @@ export type SavedQuiz = {
 };
 
 /**
+ * Data sent to the backend when saving a generated quiz from the actions bar.
+ */
+export type SaveGeneratedQuizRequest = {
+  questions: string[];
+  createdBy: string;
+};
+
+/**
+ * Response returned after saving a generated quiz.
+ */
+export type SaveGeneratedQuizResponse = {
+  status: number;
+  message: string;
+  quiz: SavedQuiz;
+  user: AuthResponse;
+};
+
+/**
  * Stores the exact quiz selection rendered in the UI,
  * so later actions (like PDF download) can reference the same question IDs.
  */

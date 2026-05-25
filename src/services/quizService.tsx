@@ -1,7 +1,10 @@
 import {
+  AuthResponse,
   PostQuestionRequest,
   QuestionResponse,
   SavedQuiz,
+  SaveGeneratedQuizRequest,
+  SaveGeneratedQuizResponse,
   UpdateQuestionRequest,
   UserQuestionQueryOptions,
 } from "../models/types";
@@ -115,13 +118,10 @@ export const getSavedQuiz = async (quizId: string) => {
 
 /**
  * Saves the currently generated quiz on the backend.
- * According to the contract the request has no body and relies on cookie auth.
+ * The caller must send the generated question ids and the authenticated user id.
  */
-export const saveGeneratedQuiz = async () => {
-  const res = await fetch(`${getQuizBaseUrl()}/quiz`, {
-    method: "PATCH",
-    credentials: "include",
-  });
+export const saveGeneratedQuiz = async (body: SaveGeneratedQuizRequest) => {
+  const res = await postData(`${getQuizBaseUrl()}/quiz`, body);
 
   if (!res.ok) {
     throw new Error(
@@ -129,7 +129,8 @@ export const saveGeneratedQuiz = async () => {
     );
   }
 
-  return res;
+  const data: SaveGeneratedQuizResponse = await res.json();
+  return data;
 };
 
 /**

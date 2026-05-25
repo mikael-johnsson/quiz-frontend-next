@@ -4,6 +4,71 @@ A living document tracking planned and in-progress features.
 
 ---
 
+## Add generated quiz save button
+
+Short description
+
+- Add a save button to `QuizActions` so a logged-in user can persist the currently generated quiz, and update `saveGeneratedQuiz` to send the generated quiz question ids plus the current user id in the request body. The backend contract now returns a structured JSON response, so the frontend should parse it, update auth state, and show success or error feedback in the quiz action area.
+
+Acceptance criteria
+
+- `QuizActions` shows a save button for the generated quiz view.
+- Clicking the button sends a `POST` request to `NEXT_PUBLIC_BASE_URL + "/quiz"` with JSON body `{ questions: string[], createdBy: string }`.
+- `questions` contains the generated quiz question ids converted to strings.
+- `createdBy` uses the logged-in user id from auth state.
+- The frontend handles the backend success response shape `{ status, message, quiz, user }`.
+- On success, the UI updates the current auth user from the returned `user` object and shows a confirmation state/message.
+- On failure, the UI shows a clear error state and does not silently fail.
+- The existing PDF download and clear quiz actions keep working.
+
+Files to change
+
+- [src/components/quiz/quizActions.tsx](src/components/quiz/quizActions.tsx) - add the save button, wire the click handler, and manage loading/error/success UI.
+- [src/services/quizService.tsx](src/services/quizService.tsx) - change `saveGeneratedQuiz` to accept a request body and parse the JSON response.
+- [src/models/types.tsx](src/models/types.tsx) - add request/response types for the generated quiz save flow, if needed.
+- [src/contexts/AuthContext.tsx](src/contexts/AuthContext.tsx) - only if the returned `user` payload needs a broader type than the current auth model.
+- [src/services/utils/httpHelpers.ts](src/services/utils/httpHelpers.ts) - only if the save helper should reuse the shared `postData` helper instead of inline `fetch`.
+
+Proposed API contract
+
+- Route: `POST /quiz`
+- Base URL: `NEXT_PUBLIC_BASE_URL`
+- Request body:
+  - `questions: string[]` - stringified ids of the generated quiz questions.
+  - `createdBy: string` - authenticated user id.
+- Recommended request example:
+  - `{ "questions": ["12", "18", "24"], "createdBy": "user-123" }`
+- Success response example:
+  - `{ "status": 201, "message": "Quiz saved", "quiz": { ...SavedQuiz }, "user": { ...AuthResponse } }`
+- Notes:
+  - The frontend should treat `message` as the user-facing success text where appropriate.
+  - The returned `user` shape matches `AuthResponse`, so the frontend can reuse the existing auth model.
+
+Step-by-step implementation
+
+1. Update `saveGeneratedQuiz` in `quizService.tsx` to accept a typed request object and `POST` JSON to `/quiz` with `credentials: "include"`.
+2. Add request/response types in `models/types.tsx` so the body and returned payload are explicit and easy for a junior developer to follow.
+3. In `quizActions.tsx`, derive the generated quiz question ids from `questions`, convert them to strings, and add a save button that calls the service.
+4. Add auth-aware guard logic in `quizActions.tsx` so the button only works for logged-in users and shows a clear message if the user is not authenticated.
+5. Add loading state, success message, and error message handling in `quizActions.tsx` so the save action gives visible feedback.
+6. Update auth state from the returned `user` payload after a successful save, so the UI stays in sync with the backend.
+7. Run targeted validation on the touched files, then manually verify the network request payload in the browser.
+
+Testing / verification
+
+1. Run a targeted type check or the repo’s usual validation command for the touched files after the code change.
+2. In the browser, generate a quiz, click the save button, and confirm the request body contains string question ids plus the logged-in user id.
+3. Confirm the UI shows a success state and the authenticated user data updates from the response.
+4. Confirm an unauthenticated user cannot submit the save request and sees the intended message instead.
+5. Confirm the existing PDF download and clear quiz actions still work.
+
+Suggested reviewers
+
+- Whoever owns the quiz backend contract, because the API must expose the request body and response shape described above.
+- A frontend reviewer familiar with the quiz action area and the existing auth state flow.
+
+Effort estimate: small to medium - mostly a service contract update plus one client component wiring change.
+
 ## Add question amount to QuizForm
 
 Short description

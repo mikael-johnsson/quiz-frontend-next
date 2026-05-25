@@ -1,6 +1,6 @@
 import { getQuestions } from "@/services/quizService";
 import styles from "./quiz.module.css";
-import QuizActions from "./quizActions";
+import QuizActions from "./components/quizActions";
 
 type QuizProps = {
   themes: string[];

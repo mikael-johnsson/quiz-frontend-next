@@ -45,6 +45,11 @@ const getQuizBaseUrl = () => {
   ).replace(/\/$/, "");
 };
 
+export type GetQuizPreviewsOptions = {
+  amount?: number;
+  createdBy?: string;
+};
+
 export const getQuestions = async (
   themes: string[],
   difficulties: string[],
@@ -76,12 +81,26 @@ export const getQuestions = async (
  * Loads the quiz previews that appear on the landing page.
  * The backend is expected to always return exactly three quizzes.
  */
-export const getQuizPreviews = async () => {
-  const res = await fetch(`${getQuizBaseUrl()}/quiz?populate=true`, {
-    method: "GET",
-    cache: "no-store",
-    credentials: "include",
-  });
+export const getQuizPreviews = async (options: GetQuizPreviewsOptions = {}) => {
+  const queryParams = new URLSearchParams();
+  queryParams.set("populate", "true");
+
+  if (typeof options.amount === "number") {
+    queryParams.set("amount", options.amount.toString());
+  }
+
+  if (options.createdBy?.trim()) {
+    queryParams.set("createdBy", options.createdBy.trim());
+  }
+
+  const res = await fetch(
+    `${getQuizBaseUrl()}/quiz?${queryParams.toString()}`,
+    {
+      method: "GET",
+      cache: "no-store",
+      credentials: "include",
+    },
+  );
 
   if (!res.ok) {
     throw new Error("Failed to load quiz previews");

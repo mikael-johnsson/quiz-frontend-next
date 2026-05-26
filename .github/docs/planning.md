@@ -4,6 +4,71 @@ A living document tracking planned and in-progress features.
 
 ---
 
+## Refactor quiz list for profile page
+
+Short description
+
+- Refactor the quiz preview flow so `QuizList` and `QuizPreviewCard` can be reused on the profile page to show only quizzes created by the logged-in user, while keeping the landing page quiz list unchanged.
+
+Acceptance criteria
+
+- The landing page still shows the public quiz preview list as it does today.
+- The profile page renders a quiz list for the logged-in user only.
+- The profile list heading is renamed to something like "Mina quiz".
+- The backend accepts `amount` and `createdBy` query parameters when loading quiz previews.
+- `getQuizPreviews` can fetch both the default landing-page list and filtered profile lists through a typed options object.
+- The quiz preview card still works for the same quiz preview data shape on both pages.
+- Empty states remain clear when the user has no created quizzes.
+
+Files to change
+
+- [src/services/quizService.tsx](src/services/quizService.tsx) - update `getQuizPreviews` to accept optional filters such as `amount` and `createdBy`.
+- [src/components/quizList/quizList.tsx](src/components/quizList/quizList.tsx) - make the list reusable for both landing and profile contexts.
+- [src/components/quizList/components/quizPreviewCard/quizPreviewCard.tsx](src/components/quizList/components/quizPreviewCard/quizPreviewCard.tsx) - keep the card focused on preview rendering and shared interaction.
+- [src/app/page.tsx](src/app/page.tsx) - keep the landing page using the default quiz list behavior.
+- [src/app/profile/[id]/page.tsx](src/app/profile/[id]/page.tsx) - pass the logged-in user's id into the quiz list.
+- [src/models/types.tsx](src/models/types.tsx) - adjust preview types if the service contract needs clearer filter support.
+
+Proposed API contract
+
+- Route: `GET /quiz`
+- Auth: cookie-based, credentials included
+- Existing query param: `populate=true`
+- New query params:
+  - `amount` - number of quiz previews to return
+  - `createdBy` - user id to filter previews by creator
+- Example requests:
+  - Landing page: `{ "url": "/quiz?populate=true&amount=3" }`
+  - Profile page: `{ "url": "/quiz?populate=true&createdBy=user-123" }`
+  - Profile page with cap: `{ "url": "/quiz?populate=true&createdBy=user-123&amount=6" }`
+- The endpoint should keep returning the same quiz preview shape that `QuizPreviewCard` already expects.
+
+Step-by-step implementation
+
+1. Update `getQuizPreviews` in `src/services/quizService.tsx` so it accepts an options object with `amount?` and `createdBy?`.
+2. Build the query string safely with `URLSearchParams` so landing-page and profile-page requests share the same code path.
+3. Refactor `QuizList` so it accepts props for title and quiz filters instead of hardcoding only the landing-page list.
+4. Update `QuizPreviewCard` only if it currently depends on landing-page-specific assumptions.
+5. Keep `src/app/page.tsx` on the default quiz list behavior.
+6. Pass the authenticated user's id from `src/app/profile/[id]/page.tsx` into `QuizList` so the profile page shows only their quizzes.
+7. Add or adjust empty-state text so the profile page explains when the user has not created any quizzes yet.
+8. Run targeted validation and confirm both pages still render correctly.
+
+Testing / verification
+
+1. Confirm the landing page still shows the global quiz preview list.
+2. Confirm the profile page shows only quizzes created by the logged-in user.
+3. Confirm the profile list heading is profile-specific.
+4. Confirm the empty state is shown when the backend returns no quizzes for the user.
+5. Run a targeted type or lint check on the touched files.
+
+Suggested reviewers
+
+- Whoever owns the quiz backend contract, because the new `createdBy` and `amount` query params must be supported server-side.
+- A frontend reviewer familiar with the landing page and profile page layout.
+
+Effort estimate: medium - roughly 3 to 5 hours depending on how much shared state or prop plumbing the list refactor needs.
+
 ## Add generated quiz save button
 
 Short description

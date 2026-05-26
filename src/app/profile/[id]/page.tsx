@@ -1,10 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import PasswordChangeForm from "@/app/profile/[id]/components/profileSettings/passwordChangeForm";
 import styles from "./page.module.css";
 import ContributionsList from "@/app/profile/[id]/components/profile/contributionsList";
 import ProfileSkeleton from "@/skeletons/profileSkeleton/profileSkeleton";
+import QuizList from "@/components/quizList/quizList";
+import type { SavedQuiz } from "@/models/types";
+import { getQuizPreviews } from "@/services/quizService";
 
 /**
  * ProfilePage - Displays the authenticated user's personal profile dashboard.
@@ -13,6 +17,40 @@ import ProfileSkeleton from "@/skeletons/profileSkeleton/profileSkeleton";
  */
 const ProfilePage = () => {
   const { user, isLoading } = useAuth();
+  const [quizzes, setQuizzes] = useState<SavedQuiz[]>([]);
+  const [isLoadingQuizzes, setIsLoadingQuizzes] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setQuizzes([]);
+      setIsLoadingQuizzes(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    const loadQuizzes = async () => {
+      setIsLoadingQuizzes(true);
+
+      try {
+        const fetchedQuizzes = await getQuizPreviews({ createdBy: user.id });
+
+        if (isMounted) {
+          setQuizzes(fetchedQuizzes);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingQuizzes(false);
+        }
+      }
+    };
+
+    void loadQuizzes();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
 
   if (isLoading) {
     return <ProfileSkeleton />;
@@ -49,6 +87,13 @@ const ProfilePage = () => {
 
       {/* Contribution stats */}
       <ContributionsList />
+
+      <QuizList
+        title="Mina quiz"
+        emptyStateText="Du har inte skapat några quiz ännu."
+        quizzes={quizzes}
+        isLoading={isLoadingQuizzes}
+      />
     </main>
   );
 };

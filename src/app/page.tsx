@@ -7,6 +7,7 @@ import { normalizeArray } from "@/lib/utils";
 import NotApprovedFeedGate from "@/components/notApprovedFeed/notApprovedFeedGate";
 import { getThemeOptions } from "@/components/quizForm/utils/getThemeOptions";
 import DevelopmentBanner from "@/components/developmentBanner/developmentBanner";
+import { getQuizPreviews } from "@/services/quizService";
 
 const NEXT_PUBLIC_QUESTION_URL = process.env.NEXT_PUBLIC_QUESTION_URL || "";
 
@@ -40,6 +41,7 @@ export default async function Home({ searchParams }: PageProps) {
   }
 
   const themes = await getThemeOptions(NEXT_PUBLIC_QUESTION_URL);
+  const quizzes = await getQuizPreviews({ amount: 3 });
 
   return (
     <main className={styles.main}>
@@ -60,7 +62,7 @@ export default async function Home({ searchParams }: PageProps) {
             amount={amount}
           />
         )}
-        <QuizList />
+        <QuizList quizzes={quizzes} />
       </div>
     </main>
   );

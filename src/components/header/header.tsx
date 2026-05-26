@@ -6,12 +6,14 @@ import MenuButton from "./components/menuButton/menuButton";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import QuestionModal from "./components/questionModal/questionModal";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user, isLoading, isAuthenticated, logoutAction } = useAuth();
+  const router = useRouter();
   const menuId = "hamburgerMenu";
 
   const handleMenuToggle = () => {
@@ -25,6 +27,7 @@ const Header = () => {
       await logoutAction();
     } finally {
       setIsLoggingOut(false);
+      router.push("/");
     }
   };
 

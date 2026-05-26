@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import PasswordChangeForm from "@/app/profile/[id]/components/profileSettings/passwordChangeForm";
 import styles from "./page.module.css";
 import ContributionsList from "@/app/profile/[id]/components/profile/contributionsList";
+import ProfileSkeleton from "@/skeletons/profileSkeleton/profileSkeleton";
 
 /**
  * ProfilePage - Displays the authenticated user's personal profile dashboard.
@@ -13,12 +14,10 @@ import ContributionsList from "@/app/profile/[id]/components/profile/contributio
 const ProfilePage = () => {
   const { user, isLoading } = useAuth();
 
-  // Show loading state while auth data is being fetched
   if (isLoading) {
-    return <div className={styles.container}>Läser in...</div>;
+    return <ProfileSkeleton />;
   }
 
-  // If user is not authenticated, show message (in real app, would redirect to login)
   if (!user) {
     return <div className={styles.container}>Du är inte inloggad</div>;
   }

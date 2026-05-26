@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Question, SavedQuiz } from "@/models/types";
+import type { SavedQuiz } from "@/models/types";
 import {
   getSavedQuiz,
   saveQuizById,
@@ -10,6 +10,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import styles from "./quizPreviewCard.module.css";
 import { HeartIcon } from "@heroicons/react/24/solid";
+import QuizPreviewContent from "../quizPreviewContent/quizPreviewContent";
 
 type QuizPreviewCardProps = {
   quiz: SavedQuiz;
@@ -101,61 +102,30 @@ export const QuizPreviewCard = ({ quiz }: QuizPreviewCardProps) => {
 
   return (
     <article className={styles.card}>
-      <button
-        type="button"
-        className={styles.creatorButton}
-        onClick={toggleQuiz}
-      >
-        Quiz skapat av: {activeQuiz.createdBy.firstname}
-      </button>
-      <div className={styles.saves}>
-        Antal sparningar: {activeQuiz.amountOfSaves}
-      </div>
+      <QuizPreviewContent
+        quiz={activeQuiz}
+        isExpanded={isExpanded}
+        isLoadingQuiz={isLoadingQuiz}
+        errorMessage={errorMessage}
+        onCreatorClick={toggleQuiz}
+      />
       <div>
         {user ? (
-          <>
-            <button
-              type="button"
-              onClick={handleSave}
-              className={styles.saveButton}
-              aria-label={isSaved ? "Ta bort sparat quiz" : "Spara quiz"}
-              aria-pressed={isSaved}
-              disabled={isLoadingQuiz}
-            >
-              <HeartIcon
-                className={styles.saveIcon}
-                color={isSaved ? "red" : "currentColor"}
-              />
-            </button>
-          </>
+          <button
+            type="button"
+            onClick={handleSave}
+            className={styles.saveButton}
+            aria-label={isSaved ? "Ta bort sparat quiz" : "Spara quiz"}
+            aria-pressed={isSaved}
+            disabled={isLoadingQuiz}
+          >
+            <HeartIcon
+              className={styles.saveIcon}
+              color={isSaved ? "red" : "currentColor"}
+            />
+          </button>
         ) : null}
       </div>
-      {isExpanded && (
-        <div className={styles.expandedContent}>
-          {isLoadingQuiz && <p className={styles.status}>Laddar quiz...</p>}
-          {errorMessage && <p className={styles.error}>{errorMessage}</p>}
-          {!isLoadingQuiz && !errorMessage && (
-            <div>
-              <h3 className={styles.expandedHeading}>Frågor i quizet</h3>
-              {quiz.questions.length > 0 ? (
-                <ol className={styles.questionList}>
-                  {(quiz.questions as (number | Question)[]).map((q) => {
-                    const isNumber = typeof q === "number";
-                    const key = isNumber ? q : (q.id ?? JSON.stringify(q));
-                    return (
-                      <li key={key} className={styles.questionItem}>
-                        {isNumber ? `Fråga med id ${q}` : q.question}
-                      </li>
-                    );
-                  })}
-                </ol>
-              ) : (
-                <p className={styles.status}>Inga frågor finns i detta quiz.</p>
-              )}
-            </div>
-          )}
-        </div>
-      )}
     </article>
   );
 };

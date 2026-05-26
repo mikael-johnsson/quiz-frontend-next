@@ -1,0 +1,125 @@
+.creatorButton,
+.creatorText {
+  width: fit-content;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.creatorButton {
+  cursor: pointer;
+}
+
+.creatorButton:hover {
+  text-decoration: underline;
+}
+
+.creatorButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.saves {
+  font-size: 0.95rem;
+}
+
+.quizLink {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.35rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background-color: var(--accent);
+  color: var(--prim-bg-color);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.quizLink:hover {
+  transform: translateY(-1px);
+}
+
+.quizLink:focus-visible {
+  outline: 2px solid var(--prim-bg-color);
+  outline-offset: 3px;
+}
+
+.expandedContent {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid
+    color-mix(in srgb, var(--prim-bg-color) 18%, transparent);
+}
+
+.expandedHeading {
+  margin-bottom: 0.4rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.questionList {
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.questionItem {
+  overflow-wrap: anywhere;
+}
+
+.questionHeading {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.answerLabel {
+  margin: 0 0 0.15rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+
+.answerText {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.metaChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--prim-bg-color) 10%, transparent);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.status {
+  font-size: 0.95rem;
+}
+
+.error {
+  font-size: 0.95rem;
+  color: #8b0000;
+}

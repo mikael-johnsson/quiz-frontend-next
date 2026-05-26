@@ -50,6 +50,71 @@ export type GetQuizPreviewsOptions = {
   createdBy?: string;
 };
 
+type QuizPdfQueryOptions = {
+  questionIds?: Array<number | string>;
+  themes?: string[];
+  difficulties?: string[];
+};
+
+const getNonEmptyStrings = (values: string[] = []) => {
+  return values
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0);
+};
+
+const getPositiveIntegerStrings = (values: Array<number | string> = []) => {
+  return values
+    .map((value) => Number(value))
+    .filter((value) => Number.isInteger(value) && value > 0)
+    .map((value) => String(value));
+};
+
+export const buildQuizPdfQueryParams = ({
+  questionIds = [],
+  themes = [],
+  difficulties = [],
+}: QuizPdfQueryOptions = {}) => {
+  const queryParams = new URLSearchParams();
+
+  getPositiveIntegerStrings(questionIds).forEach((questionId) => {
+    queryParams.append("questionIds", questionId);
+  });
+
+  getNonEmptyStrings(themes).forEach((theme) => {
+    queryParams.append("themes", theme);
+  });
+
+  getNonEmptyStrings(difficulties).forEach((difficulty) => {
+    queryParams.append("difficulties", difficulty);
+  });
+
+  return queryParams;
+};
+
+export const buildQuizPdfHref = (options: QuizPdfQueryOptions = {}) => {
+  return `/api/quiz/pdf?${buildQuizPdfQueryParams(options).toString()}`;
+};
+
+export const buildSavedQuizPdfHref = (quiz: SavedQuiz) => {
+  const questionIds = quiz.questions
+    .map((question) => (typeof question === "number" ? question : question.id))
+    .filter((questionId) => Number.isInteger(questionId) && questionId > 0);
+
+  const themes = quiz.questions.flatMap((question) =>
+    typeof question === "number" ? [] : question.themes,
+  );
+
+  const difficulties = quiz.questions.flatMap((question) =>
+    typeof question === "number" ? [] : [question.difficulty],
+  );
+
+  return buildQuizPdfHref({
+    questionIds,
+    themes,
+    difficulties,
+  });
+};
+
 export const getQuestions = async (
   themes: string[],
   difficulties: string[],
@@ -121,11 +186,14 @@ export const getSavedQuiz = async (quizId: string) => {
     "getSavedQuiz fetch: ",
     `${getQuizBaseUrl()}/quiz/${encodedQuizId}`,
   );
-  const res = await fetch(`${getQuizBaseUrl()}/quiz/${encodedQuizId}`, {
-    method: "GET",
-    cache: "no-store",
-    credentials: "include",
-  });
+  const res = await fetch(
+    `${getQuizBaseUrl()}/quiz/${encodedQuizId}?&populate=true`,
+    {
+      method: "GET",
+      cache: "no-store",
+      credentials: "include",
+    },
+  );
 
   if (!res.ok) {
     throw new Error("Failed to load quiz details");
@@ -266,27 +334,11 @@ export const getPdf = async (
   difficulties: string[],
   questionIds: number[] = [],
 ) => {
-  const queryParams = new URLSearchParams();
-
-  questionIds
-    .filter((questionId) => Number.isInteger(questionId) && questionId > 0)
-    .forEach((questionId) =>
-      queryParams.append("questionIds", questionId.toString()),
-    );
-
-  themes
-    .map((theme) => theme.trim())
-    .filter((theme) => theme.length > 0)
-    .forEach((theme) => queryParams.append("themes", theme));
-
-  difficulties
-    .map((difficulty) => difficulty.trim())
-    .filter((difficulty) => difficulty.length > 0)
-    .forEach((difficulty) => queryParams.append("difficulties", difficulty));
-
-  console.log(
-    `PDF URL: ${NEXT_PUBLIC_QUESTION_URL}/pdf?${queryParams.toString()}`,
-  );
+  const queryParams = buildQuizPdfQueryParams({
+    questionIds,
+    themes,
+    difficulties,
+  });
 
   const res = await fetch(
     `${NEXT_PUBLIC_QUESTION_URL}/pdf?${queryParams.toString()}`,
@@ -296,7 +348,6 @@ export const getPdf = async (
       credentials: "include",
     },
   );
-  console.log("PDF response status:", res);
 
   if (!res.ok) {
     console.log("error");

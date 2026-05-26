@@ -4,6 +4,66 @@ A living document tracking planned and in-progress features.
 
 ---
 
+## Add a dedicated quiz route
+
+Short description
+
+- Give each saved quiz its own route based on `_id`, and render a full quiz view that matches the current `QuizPreviewCard` layout but stays open by default. The route should also include a PDF download button that reuses the same download flow used in `QuizActions`.
+
+Acceptance criteria
+
+- Visiting the new quiz route with a valid quiz `_id` loads that quiz and shows its creator, save count, and question list without requiring a click to expand.
+- The route renders a view that looks and feels like `QuizPreviewCard`, but it is always expanded.
+- The page includes a PDF download button that uses the same request-building logic as the existing generated-quiz download action.
+- Invalid or missing quiz ids show a clear empty/error state instead of a broken page.
+- The implementation reuses the existing quiz service and avoids duplicating PDF query-string logic.
+
+Files to change
+
+- [src/app/quiz/[id]/page.tsx](src/app/quiz/[id]/page.tsx) - new route page that loads one quiz by `_id` and renders the detail view.
+- [src/components/quizList/components/quizPreviewCard/quizPreviewCard.tsx](src/components/quizList/components/quizPreviewCard/quizPreviewCard.tsx) - extract or extend the card so it can render in forced-open mode.
+- [src/components/quiz/quizActions.tsx](src/components/quiz/quizActions.tsx) - reuse or extract the PDF link-building logic so the new route gets the same download behavior.
+- [src/services/quizService.tsx](src/services/quizService.tsx) - keep `getSavedQuiz` as the route data source and add any small helper needed for the PDF download URL.
+- [src/models/types.tsx](src/models/types.tsx) - tighten quiz detail types if the route needs a clearer distinction between preview and full quiz data.
+- [src/app/api/quiz/pdf/route.ts](src/app/api/quiz/pdf/route.ts) - only if the PDF endpoint needs to accept quiz ids directly instead of reconstructed question ids.
+
+Proposed API contract
+
+- Route page: `GET /quiz/[id]`
+- Data source: `GET /quiz/:id` via `getSavedQuiz(id)`
+- PDF download options:
+  - Preferred: keep using `GET /api/quiz/pdf` with `questionIds`, `themes`, and `difficulties` query params built from the loaded quiz data.
+  - If the backend cannot reconstruct a PDF from those values reliably, add a backend-supported quiz-id contract such as `GET /api/quiz/pdf?quizId=:id` or `GET /quiz/:id/pdf`.
+- Example page behavior:
+  - Load quiz by `_id`
+  - Render creator name, save count, and all questions in expanded state
+  - Build the PDF link from the currently loaded quiz data
+
+Step-by-step implementation
+
+1. Add a new dynamic route at `src/app/quiz/[id]/page.tsx` that reads the route param, calls `getSavedQuiz`, and handles loading and error states.
+2. Split the current preview card into a shared render path so the existing list card and the route page can use the same quiz content markup.
+3. Add a prop such as `forceExpanded` or `defaultExpanded` so the detail route can show the questions immediately while the list card keeps its current toggle behavior.
+4. Reuse the same PDF URL-building logic from `QuizActions` so the new route can download a PDF without duplicating query-string construction.
+5. Decide whether the new route should keep using the existing `/api/quiz/pdf` query contract or whether the backend needs a quiz-id-based PDF endpoint, then wire the route to that contract.
+6. Add a friendly empty state for missing quizzes and a clear message for invalid ids or fetch failures.
+7. Verify that the landing page quiz list still uses the collapsed preview card and that the new route does not change that behavior.
+
+Testing / verification
+
+1. Open a valid quiz route directly in the browser and confirm the quiz content renders open by default.
+2. Click the PDF download button and confirm the downloaded file matches the loaded quiz.
+3. Open the route with a bad `_id` and confirm the error state is readable.
+4. Confirm the landing page quiz previews still collapse and expand exactly as before.
+5. Run a targeted type check or lint check on the touched route, component, and service files.
+
+Suggested reviewers
+
+- Whoever owns the quiz backend contract, because the route depends on the existing `GET /quiz/:id` response and may need a quiz-id PDF contract.
+- A frontend reviewer familiar with the quiz preview card and the existing PDF download flow.
+
+Effort estimate: medium - roughly 3 to 5 hours depending on whether the PDF button can reuse the existing query-param flow unchanged.
+
 ## Refactor quiz list for profile page
 
 Short description

@@ -105,7 +105,7 @@ const QuizActions = ({ questions, themes, difficulties }: QuizActionsProps) => {
       const result = await saveGeneratedQuiz({
         questions: generatedQuestionIds,
         createdBy: user.id,
-        name: trimmedQuizName,
+        quizName: trimmedQuizName,
       });
 
       setUser(result.user);

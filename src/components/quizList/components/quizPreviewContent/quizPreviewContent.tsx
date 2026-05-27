@@ -21,30 +21,31 @@ const QuizPreviewContent = ({
 }: QuizPreviewContentProps) => {
   const shouldShowExpandedContent = isExpanded || forceExpanded;
 
-  const creator = onCreatorClick ? (
-    <button
-      type="button"
+  const quizName = onCreatorClick ? (
+    <Link
+      href={`/quiz/${encodeURIComponent(quiz._id)}`}
       className={styles.creatorButton}
-      onClick={onCreatorClick}
     >
-      Quiz skapat av: {quiz.createdBy.firstname}
-    </button>
+      Namn: {quiz.quizName}
+    </Link>
   ) : (
-    <p className={styles.creatorText}>
-      Quiz skapat av: {quiz.createdBy.firstname}
-    </p>
+    <p className={styles.creatorText}>Namn: {quiz.quizName}</p>
   );
+
+  const openQuizLink = onCreatorClick ? (
+    <button type="button" className={styles.quizLink} onClick={onCreatorClick}>
+      Öppna quiz
+    </button>
+  ) : null;
 
   return (
     <>
-      {creator}
+      <div className={styles.creator}>
+        {quizName} {openQuizLink}
+      </div>
+
       <div className={styles.saves}>Antal sparningar: {quiz.amountOfSaves}</div>
-      <Link
-        href={`/quiz/${encodeURIComponent(quiz._id)}`}
-        className={styles.quizLink}
-      >
-        Öppna quiz
-      </Link>
+
       {shouldShowExpandedContent && (
         <div className={styles.expandedContent}>
           {isLoadingQuiz && <p className={styles.status}>Laddar quiz...</p>}

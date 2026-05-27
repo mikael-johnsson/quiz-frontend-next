@@ -205,7 +205,8 @@ export const getSavedQuiz = async (quizId: string) => {
 
 /**
  * Saves the currently generated quiz on the backend.
- * The caller must send the generated question ids and the authenticated user id.
+ * The caller must send the generated question ids, the authenticated user id,
+ * and the required quiz name.
  */
 export const saveGeneratedQuiz = async (body: SaveGeneratedQuizRequest) => {
   const res = await postData(`${getQuizBaseUrl()}/quiz`, body);

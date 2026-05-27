@@ -25,11 +25,15 @@ const QuizActions = ({ questions, themes, difficulties }: QuizActionsProps) => {
   const [saveMessage, setSaveMessage] = useState("");
   const [saveError, setSaveError] = useState("");
   const [isSavingQuiz, setIsSavingQuiz] = useState(false);
+  const [isQuizNameVisible, setIsQuizNameVisible] = useState(false);
+  const [quizName, setQuizName] = useState("");
   const { user, setUser } = useAuth();
 
   const router = useRouter();
 
   const generatedQuestionIds = questions.map((question) => String(question.id));
+  const trimmedQuizName = quizName.trim();
+  const canSaveQuiz = trimmedQuizName.length > 0;
 
   useEffect(() => {
     saveQuizSnapshot({
@@ -87,6 +91,12 @@ const QuizActions = ({ questions, themes, difficulties }: QuizActionsProps) => {
       return;
     }
 
+    if (!canSaveQuiz) {
+      setSaveMessage("");
+      setSaveError("Ange ett namn för quizet först.");
+      return;
+    }
+
     setSaveMessage("");
     setSaveError("");
     setIsSavingQuiz(true);
@@ -95,6 +105,7 @@ const QuizActions = ({ questions, themes, difficulties }: QuizActionsProps) => {
       const result = await saveGeneratedQuiz({
         questions: generatedQuestionIds,
         createdBy: user.id,
+        name: trimmedQuizName,
       });
 
       setUser(result.user);
@@ -134,12 +145,40 @@ const QuizActions = ({ questions, themes, difficulties }: QuizActionsProps) => {
       </Link>
       <button
         type="button"
-        className={styles.saveButton}
-        onClick={handleSaveQuiz}
-        disabled={isSavingQuiz}
+        className={styles.nameToggleButton}
+        onClick={() => setIsQuizNameVisible((current) => !current)}
       >
-        {isSavingQuiz ? "Sparar quiz..." : "Spara quiz"}
+        {isQuizNameVisible ? "Dölj namn" : "Spara quiz"}
       </button>
+
+      {isQuizNameVisible && (
+        <div className={styles.nameField}>
+          <label className={styles.nameLabel} htmlFor="quiz-name">
+            Quiznamn
+          </label>
+          <input
+            id="quiz-name"
+            type="text"
+            className={styles.nameInput}
+            value={quizName}
+            onChange={(event) => setQuizName(event.target.value)}
+            placeholder="Skriv ett namn för quizet"
+            aria-describedby="quiz-name-hint"
+          />
+          <p id="quiz-name-hint" className={styles.nameHint}>
+            Namnet visas när du sparar quizet.
+          </p>
+
+          <button
+            type="button"
+            className={styles.saveButton}
+            onClick={handleSaveQuiz}
+            disabled={isSavingQuiz || !canSaveQuiz}
+          >
+            {isSavingQuiz ? "Sparar quiz..." : "Spara quiz"}
+          </button>
+        </div>
+      )}
       {fallbackWarning && (
         <p className={styles.snapshotWarning}>{fallbackWarning}</p>
       )}

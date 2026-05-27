@@ -373,3 +373,62 @@ Acceptance criteria
 - `GET /me` remains the canonical source of truth; `refreshMe()` updates local `user` accordingly.
 
 Effort estimate: small — ~30–60 minutes to implement client-side refresh and basic optimistic UI.
+
+## Add quiz naming to QuizActions
+
+Short description
+
+- Add a required quiz name to the generated quiz save flow in `QuizActions`. A toggle should reveal a name input, and the save button should stay hidden or disabled until a valid name is entered. The request body should include the name as a string alongside the generated question ids and authenticated user id.
+
+Acceptance criteria
+
+- `QuizActions` includes a toggle that shows or hides the quiz name input.
+- The save action is hidden or disabled until the user enters a non-empty trimmed quiz name.
+- Saving sends `questions`, `createdBy`, and `name` to the backend as strings.
+- The frontend keeps the existing save loading, success, and error states.
+- Existing PDF download and clear quiz actions continue to work unchanged.
+
+Files to change
+
+- [src/components/quiz/quizActions.tsx](src/components/quiz/quizActions.tsx) - add toggle state, the name input, and the gated save handler.
+- [src/services/quizService.tsx](src/services/quizService.tsx) - forward the full save request body without dropping the new name field.
+- [src/models/types.tsx](src/models/types.tsx) - add the `name` field to the generated quiz save request and any saved quiz type that should preserve it.
+- [src/lib/utils.tsx](src/lib/utils.tsx) - only if the quiz name should be stored in the local quiz snapshot.
+- [src/components/quiz/quiz.module.css](src/components/quiz/quiz.module.css) - only if the new input and toggle need layout or visibility styling.
+
+Proposed API contract
+
+- Route: `POST /quiz`
+- Request body:
+  - `questions: string[]`
+  - `createdBy: string`
+  - `name: string`
+- Example request:
+  - `{ "questions": ["12", "18", "24"], "createdBy": "user-123", "name": "History warm-up" }`
+- Response should include the saved quiz and user data if the UI needs to reflect the new title immediately.
+
+Step-by-step implementation
+
+1. Update the quiz save request and saved quiz types in `src/models/types.tsx` so the name is explicit and typed as a string.
+2. Confirm `saveGeneratedQuiz` in `src/services/quizService.tsx` forwards the full request body without reshaping it.
+3. Add local state in `src/components/quiz/quizActions.tsx` for the toggle, the name value, loading, and validation feedback.
+4. Make the toggle reveal the name input and keep the save action hidden or disabled until the trimmed name is valid.
+5. Update the save handler so it submits the quiz name together with the generated question ids and authenticated user id.
+6. Keep the existing success and error messaging, and prevent duplicate submissions while saving.
+7. Only update `src/lib/utils.tsx` if the quiz name should survive refreshes or be reused in another action.
+8. Adjust styles only if the new input changes spacing or visibility in the action area.
+
+Testing / verification
+
+1. Run a targeted type check or lint check on the touched quiz files.
+2. In the browser, generate a quiz, reveal the name input, enter a valid name, and confirm the save button becomes available only then.
+3. Inspect the save request and confirm it includes `questions`, `createdBy`, and `name`.
+4. Confirm the save success and error messages still render correctly.
+5. Confirm the PDF download and clear quiz actions still work as before.
+
+Suggested reviewers
+
+- Whoever owns the quiz backend contract, because the `POST /quiz` request body must accept the new `name` field.
+- A frontend reviewer familiar with the quiz action area and the existing auth flow.
+
+Effort estimate: small to medium - roughly 1 to 3 hours depending on whether the name should also be persisted in the quiz snapshot.

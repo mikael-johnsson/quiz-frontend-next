@@ -91,6 +91,71 @@
   cursor: not-allowed;
 }
 
+.nameToggleButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 0.55rem 1.25rem;
+  border-radius: 8px;
+  border: 1px solid var(--prim-text-color);
+  background-color: transparent;
+  color: var(--prim-text-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.nameToggleButton:hover {
+  background-color: color-mix(in srgb, var(--prim-text-color) 12%, transparent);
+}
+
+.nameToggleButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.nameField {
+  width: 100%;
+  max-width: 32rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: stretch;
+}
+
+.nameLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--prim-text-color);
+}
+
+.nameInput {
+  width: 100%;
+  min-height: 2.7rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--prim-text-color);
+  background-color: transparent;
+  color: var(--prim-text-color);
+  font-size: 0.95rem;
+}
+
+.nameInput::placeholder {
+  color: color-mix(in srgb, var(--prim-text-color) 65%, transparent);
+}
+
+.nameInput:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.nameHint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--prim-text-color) 80%, transparent);
+}
+
 .snapshotWarning {
   width: 100%;
   margin: 0;

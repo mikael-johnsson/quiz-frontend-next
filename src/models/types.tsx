@@ -23,6 +23,7 @@ export type SavedQuiz = {
   _id: string;
   questions: number[] | Question[];
   createdBy: { id: string; firstname: string };
+  name?: string;
   amountOfSaves: number;
   createdWhen?: string;
 };
@@ -33,6 +34,7 @@ export type SavedQuiz = {
 export type SaveGeneratedQuizRequest = {
   questions: string[];
   createdBy: string;
+  name: string;
 };
 
 /**

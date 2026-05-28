@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type MouseEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Question } from "@/models/types";
@@ -85,6 +85,10 @@ const QuizActions = ({ questions, themes, difficulties }: QuizActionsProps) => {
   };
 
   const handleSaveQuiz = async () => {
+    if (isSavingQuiz) {
+      return;
+    }
+
     if (!user) {
       setSaveError("");
       setSaveMessage("Logga in för att spara quizet.");
@@ -114,6 +118,8 @@ const QuizActions = ({ questions, themes, difficulties }: QuizActionsProps) => {
         router.refresh();
       } catch {}
       setSaveMessage(result.message || "Quizet sparades.");
+      setQuizName("");
+      setIsQuizNameVisible(false);
     } catch (error) {
       setSaveMessage("");
       setSaveError(
@@ -122,6 +128,18 @@ const QuizActions = ({ questions, themes, difficulties }: QuizActionsProps) => {
     } finally {
       setIsSavingQuiz(false);
     }
+  };
+
+  const handleQuizNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setQuizName(event.target.value);
+    setSaveMessage("");
+    setSaveError("");
+  };
+
+  const handleQuizNameToggle = () => {
+    setIsQuizNameVisible((current) => !current);
+    setSaveMessage("");
+    setSaveError("");
   };
 
   return (
@@ -146,7 +164,8 @@ const QuizActions = ({ questions, themes, difficulties }: QuizActionsProps) => {
       <button
         type="button"
         className={styles.nameToggleButton}
-        onClick={() => setIsQuizNameVisible((current) => !current)}
+        onClick={handleQuizNameToggle}
+        disabled={isSavingQuiz}
       >
         {isQuizNameVisible ? "Dölj namn" : "Spara quiz"}
       </button>
@@ -161,9 +180,10 @@ const QuizActions = ({ questions, themes, difficulties }: QuizActionsProps) => {
             type="text"
             className={styles.nameInput}
             value={quizName}
-            onChange={(event) => setQuizName(event.target.value)}
+            onChange={handleQuizNameChange}
             placeholder="Skriv ett namn för quizet"
             aria-describedby="quiz-name-hint"
+            disabled={isSavingQuiz}
           />
           <p id="quiz-name-hint" className={styles.nameHint}>
             Namnet visas när du sparar quizet.
